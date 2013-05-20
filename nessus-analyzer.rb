@@ -7,8 +7,6 @@ require 'terminal-table'
 require 'yaml'
 require 'trollop'
 
-report_root_dir = "/data/nessus-analyzer-data/"
-
 def calculate_top_events(scan, event_count)
   # We're going to store the event details as a hash of hashes
   unique_events = Hash.new{|h, k| h[k] = {}}
@@ -76,30 +74,31 @@ def calculate_statistics(scan)
   puts aggregate_statistics
 end
 
+def process_nessus_file(nessus_file)
+  Nessus::Parse.new(nessus_file) do |scan|
+    calculate_top_events(scan, @opts[:top_events]) unless @opts[:top_events].nil? ||  @opts[:top_events] == 0
+    calculate_statistics(scan) if @opts[:show_statistics]
+  end
+end
+# main
 if __FILE__ == $PROGRAM_NAME
   # handle options
-  opts = Trollop::options do
+  @opts = Trollop::options do
     opt :top_events, "The <i> most common events", :type => Integer, :short => "-t"
     opt :show_statistics, "Show report statistic", :short => "-s"
     opt :file, "The .nessus file you want to process", :type => String, :short => "-f"
     opt :dir, "The directory containing .nessus files you want to process", :type => String, :short => "-d"
   end
-  Trollop::die :file, "must exist" unless File.exist?(opts[:file]) if opts[:file] 
-  Trollop::die :dir, "Your directory must exist" unless Dir.exist?(opts[:dir]) if opts[:dir] 
-  Trollop::die :dir, "You can't specify a file and directory" if opts[:file] && opts[:dir]
+  Trollop::die :file, "must exist" unless File.exist?(@opts[:file]) if @opts[:file] 
+  Trollop::die :dir, "Your directory must exist" unless Dir.exist?(@opts[:dir]) if @opts[:dir] 
+  Trollop::die :dir, "You can't specify a file and directory" if @opts[:file] && @opts[:dir]
   
-  if opts[:dir]
-    Dir.glob(report_root_dir+'*.nessus') do |report_file|
-      Nessus::Parse.new(report_file) do |scan|
-        calculate_top_events(scan, opts[:top_events]) unless opts[:top_events].nil? ||  opts[:top_events] == 0
-        calculate_statistics(scan) if opts[:show_statistics]
-      end
+  if @opts[:dir]
+    Dir.glob(@opts[:dir]+'*.nessus') do |report_file|
+      process_nessus_file report_file
     end
-  elsif opts[:file]
-    report_file = opts[:file]  
-    Nessus::Parse.new(report_file) do |scan|
-      calculate_top_events(scan, opts[:top_events]) unless opts[:top_events].nil? ||  opts[:top_events] == 0
-      calculate_statistics(scan) if opts[:show_statistics]
-    end
+  elsif @opts[:file]
+    report_file = @opts[:file]  
+    process_nessus_file report_file
   end
 end
