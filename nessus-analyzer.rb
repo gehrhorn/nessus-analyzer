@@ -5,6 +5,7 @@ require 'rubygems'
 require 'ruby-nessus'
 require 'terminal-table'
 require 'yaml'
+require 'set'
 require 'trollop'
 
 def calculate_top_events(scan, event_count)
@@ -74,12 +75,22 @@ def calculate_statistics(scan)
   aggregate_statistics.align_column(1, :right)
   puts aggregate_statistics
 end
-
+def find_hosts_by_id(scan, event_id)
+  hosts = Set.new 
+  scan.each_host do |host|
+    next if host.total_event_count.zero?
+    host.each_event do |event|
+      hosts << host.ip if event.id == event_id
+    end
+  end
+  hosts.to_a
+end
 def process_nessus_file(nessus_file)
   Nessus::Parse.new(nessus_file) do |scan|
     calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
     calculate_statistics(scan) if @opts[:show_statistics]
+    puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
   end
 end
 
@@ -93,6 +104,8 @@ if __FILE__ == $PROGRAM_NAME
       :short => "-f"
     opt :dir, "The directory containing .nessus files you want to process", 
       :type => String, :short => "-d"
+    opt :event_id, "Show all hosts that match the supplied id", 
+      :type => Integer, :short => "-e"
   end
   Trollop::die :file, "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
