@@ -1,12 +1,15 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH << 'lib'
 require 'rubygems'
 require 'ruby-nessus'
 require 'terminal-table'
-require 'pp'
+require 'yaml'
+require 'trollop'
+
 report_root_dir = "/data/nessus-analyzer-data/"
 
-def calculate_top_events(scan, event_count = 10)
+def calculate_top_events(scan, event_count)
   # We're going to store the event details as a hash of hashes
   unique_events = Hash.new{|h, k| h[k] = {}}
   scan.each_host do |host|
@@ -31,7 +34,9 @@ def calculate_top_events(scan, event_count = 10)
       end # if
     end # host.each_event
   end # scan.each_host
-  pp unique_events.sort_by{|k, v| -v[:count]}.take(event_count)
+
+  # sort the hash by v[:count] (descending)
+  puts unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_yaml
 end
 
 
@@ -71,10 +76,16 @@ def calculate_statistics(scan)
   puts aggregate_statistics
 end
 
-Dir.glob(report_root_dir+'*.nessus') do |report_file|
-  Nessus::Parse.new(report_file) do |scan|
-    calculate_top_events(scan, 10)
-    # calculate_statistics(scan)
+if __FILE__ == $PROGRAM_NAME
+  opts = Trollop::options do
+    opt :top_events, "The <i> most common events", :default => 10
+
+  end
+  Dir.glob(report_root_dir+'*.nessus') do |report_file|
+    Nessus::Parse.new(report_file) do |scan|
+      calculate_top_events(scan, opts[:top_events])
+      # calculate_statistics(scan)
+    end
   end
 end
 
