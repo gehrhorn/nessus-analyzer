@@ -9,7 +9,7 @@ require 'trollop'
 
 report_root_dir = "/data/nessus-analyzer-data/"
 
-def calculate_top_events(scan, event_count = 10)
+def calculate_top_events(scan, event_count)
   # We're going to store the event details as a hash of hashes
   unique_events = Hash.new{|h, k| h[k] = {}}
   scan.each_host do |host|
