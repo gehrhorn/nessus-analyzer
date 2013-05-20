@@ -22,6 +22,7 @@ def calculate_top_events(scan, event_count)
         unique_events[event.id] = {:count => 1,
                                    :name => event.name, 
                                    :severity => event.severity,
+                                   :severity_in_words => event.severity.in_words,
                                    :family => event.family,
                                    :synopsis => event.synopsis,
                                    :description=> event.description,
