@@ -77,27 +77,29 @@ def calculate_statistics(scan)
 end
 
 if __FILE__ == $PROGRAM_NAME
-  # opts = Trollop::options do
-  #   opt :top_events, "The <i> most common events", :type => Integer 
-
-  # end
-  # Trollop::die "Please specify some options" if ARGV.empty?
-
-  p = Trollop::Parser.new do
+  # handle options
+  opts = Trollop::options do
     opt :top_events, "The <i> most common events", :type => Integer, :short => "-t"
     opt :show_statistics, "Show report statistic", :short => "-s"
+    opt :file, "The .nessus file you want to process", :type => String, :short => "-f"
+    opt :dir, "The directory containing .nessus files you want to process", :type => String, :short => "-d"
   end
-  opts = Trollop::with_standard_exception_handling p do
-    raise Trollop::HelpNeeded if ARGV.empty? # show help screen
-    p.parse ARGV
-  end
-  Dir.glob(report_root_dir+'*.nessus') do |report_file|
+  Trollop::die :file, "must exist" unless File.exist?(opts[:file]) if opts[:file] 
+  Trollop::die :dir, "Your directory must exist" unless Dir.exist?(opts[:dir]) if opts[:dir] 
+  Trollop::die :dir, "You can't specify a file and directory" if opts[:file] && opts[:dir]
+  
+  if opts[:dir]
+    Dir.glob(report_root_dir+'*.nessus') do |report_file|
+      Nessus::Parse.new(report_file) do |scan|
+        calculate_top_events(scan, opts[:top_events]) unless opts[:top_events].nil? ||  opts[:top_events] == 0
+        calculate_statistics(scan) if opts[:show_statistics]
+      end
+    end
+  elsif opts[:file]
+    report_file = opts[:file]  
     Nessus::Parse.new(report_file) do |scan|
       calculate_top_events(scan, opts[:top_events]) unless opts[:top_events].nil? ||  opts[:top_events] == 0
       calculate_statistics(scan) if opts[:show_statistics]
     end
   end
 end
-
-
-
