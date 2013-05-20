@@ -77,10 +77,13 @@ def calculate_statistics(scan)
 end
 
 if __FILE__ == $PROGRAM_NAME
+  opts = Trollop::options do
+    opt :top_events, "The <i> most common events", :default => 10
 
+  end
   Dir.glob(report_root_dir+'*.nessus') do |report_file|
     Nessus::Parse.new(report_file) do |scan|
-      calculate_top_events(scan, 10)
+      calculate_top_events(scan, opts[:top_events])
       # calculate_statistics(scan)
     end
   end
