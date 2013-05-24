@@ -4,7 +4,7 @@ $LOAD_PATH << 'lib'
 require 'rubygems'
 require 'ruby-nessus'
 require 'terminal-table'
-require 'yaml'
+require 'json'
 require 'set'
 require 'trollop'
 
@@ -36,7 +36,7 @@ def calculate_top_events(scan, event_count)
   end # scan.each_host
 
   # sort the hash by v[:count] (descending)
-  puts unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_yaml
+  puts unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_json
 end
 
 def calculate_statistics(scan)
