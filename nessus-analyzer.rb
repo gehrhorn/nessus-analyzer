@@ -85,6 +85,7 @@ def find_hosts_by_id(scan, event_id)
   end
   hosts.to_a
 end
+
 def process_nessus_file(nessus_file)
   Nessus::Parse.new(nessus_file) do |scan|
     calculate_top_events(scan, @opts[:top_events]) unless 
@@ -97,6 +98,13 @@ end
 # main
 if __FILE__ == $PROGRAM_NAME
   @opts = Trollop::options do
+    banner <<-EOS
+    Nessus-Analyzer parses nessus output files.
+    Usage:
+      ./nessus-analyzer.rb [options] [file/directory]
+    where [options] are:
+    EOS
+
     opt :top_events, "The <i> most common events", :type => Integer, 
       :short => "-t"
     opt :show_statistics, "Show report statistic", :short => "-s"
@@ -107,13 +115,16 @@ if __FILE__ == $PROGRAM_NAME
     opt :event_id, "Show all hosts that match the supplied id", 
       :type => Integer, :short => "-e"
   end
+
   Trollop::die :file, "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
   Trollop::die :dir, "Your directory must exist" unless 
     Dir.exist?(@opts[:dir]) if @opts[:dir] 
   Trollop::die :dir, "You can't specify a file and directory" if 
     @opts[:file] && @opts[:dir]
-  
+  Trollop::die :file, "You need to specify a file or directory" if 
+    @opts[:file].nil? && @opts[:dir].nil?
+
   if @opts[:dir]
     path = @opts[:dir].dup
     path << '/' if path[-1] != '/' # end in a slash
