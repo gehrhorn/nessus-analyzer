@@ -40,11 +40,9 @@ def calculate_top_events(scan, event_count)
 end
 
 def calculate_statistics(scan)
-  aggregate_high_severity_count = 0 
-  hosts_with_high_severity_count = 0
+  hosts_with_high_severity_issue = 0
   total_hosts = 0
   total_hosts += scan.host_count
-  aggregate_high_severity_count += scan.high_severity_count
 
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
@@ -55,23 +53,19 @@ def calculate_statistics(scan)
   output_table << ['Open ports', scan.open_ports_count]
 
   scan.each_host do |host|
-    hosts_with_high_severity_count += 1 if host.high_severity_count > 0
+    hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
   end
 
-  # aggregate_statistics = Terminal::Table.new :title => "Aggregate statistics",
-    # :style => { :width => 60 }
-  output_table << :separator
-  output_table << ['Aggregate high severity issuse',
-                           aggregate_high_severity_count]
-  output_table << ['Hosts with high severity issues',
-                           hosts_with_high_severity_count]
+  output_table.add_separator
+  output_table << ['Hosts with at least one high severity issue',
+                           hosts_with_high_severity_issue]
   percent_hosts_high_severity = sprintf "%.2f%%", 
-    (100 * hosts_with_high_severity_count.to_f / total_hosts)
+    (100 * hosts_with_high_severity_issue.to_f / total_hosts)
   output_table << ['% hosts with a high severity issue', 
                            percent_hosts_high_severity]
-  # aggregate_statistics.align_column(1, :right)
+
   output_table.align_column(1, :right)
-  puts output_table
+  output_table
 end
 
 def find_hosts_by_id(scan, event_id)
@@ -89,7 +83,7 @@ def process_nessus_file(nessus_file)
   Nessus::Parse.new(nessus_file) do |scan|
     calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
-    calculate_statistics(scan) if @opts[:show_statistics]
+      puts calculate_statistics(scan) if @opts[:show_statistics]
     puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
   end
 end
