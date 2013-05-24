@@ -39,7 +39,6 @@ def calculate_top_events(scan, event_count)
   puts unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_yaml
 end
 
-
 def calculate_statistics(scan)
   aggregate_high_severity_count = 0 
   hosts_with_high_severity_count = 0
