@@ -48,32 +48,32 @@ def calculate_statistics(scan)
 
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
+  output_table << ['Total hosts', total_hosts]
   output_table << ['High severity issues', scan.high_severity_count]
   output_table << ['Medium severity issues', scan.medium_severity_count]
   output_table << ['Low severity isseus', scan.low_severity_count]
   output_table << ['Open ports', scan.open_ports_count]
-  output_table.align_column(1, :right)
-  puts output_table
 
   scan.each_host do |host|
     hosts_with_high_severity_count += 1 if host.high_severity_count > 0
   end
 
-  aggregate_statistics = Terminal::Table.new :title => "Aggregate statistics",
-    :style => { :width => 60 }
-  aggregate_statistics << ['Aggregate high severity issuse',
+  # aggregate_statistics = Terminal::Table.new :title => "Aggregate statistics",
+    # :style => { :width => 60 }
+  output_table << :separator
+  output_table << ['Aggregate high severity issuse',
                            aggregate_high_severity_count]
-  aggregate_statistics << ['Hosts with high severity issues',
+  output_table << ['Hosts with high severity issues',
                            hosts_with_high_severity_count]
-  aggregate_statistics << ['Total hosts',
-                           total_hosts]
   percent_hosts_high_severity = sprintf "%.2f%%", 
     (100 * hosts_with_high_severity_count.to_f / total_hosts)
-  aggregate_statistics << ['% hosts with a high severity issue', 
+  output_table << ['% hosts with a high severity issue', 
                            percent_hosts_high_severity]
-  aggregate_statistics.align_column(1, :right)
-  puts aggregate_statistics
+  # aggregate_statistics.align_column(1, :right)
+  output_table.align_column(1, :right)
+  puts output_table
 end
+
 def find_hosts_by_id(scan, event_id)
   hosts = Set.new 
   scan.each_host do |host|
