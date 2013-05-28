@@ -69,7 +69,6 @@ def calculate_statistics(scan)
   output_table << ["CVSS / IP", cvss_per_ip]
 
   output_table.align_column(1, :right)
-  puts (aggregate_cvss_score / scan.host_count)
   output_table
 end
 
