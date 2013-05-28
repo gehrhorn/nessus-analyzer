@@ -41,10 +41,12 @@ end
 
 def calculate_statistics(scan)
   hosts_with_high_severity_issue = 0
-  aggregate_cvss_score = 0
+  total_hosts = 0
+  total_hosts += scan.host_count
+
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
-  output_table << ['Total hosts', scan.host_count]
+  output_table << ['Total hosts', total_hosts]
   output_table << ['High severity issues', scan.high_severity_count]
   output_table << ['Medium severity issues', scan.medium_severity_count]
   output_table << ['Low severity isseus', scan.low_severity_count]
@@ -52,21 +54,15 @@ def calculate_statistics(scan)
 
   scan.each_host do |host|
     hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
-    host.each_event do |event|
-      aggregate_cvss_score += event.cvss_base_score unless 
-        event.cvss_base_score == false
-    end
   end
 
   output_table.add_separator
   output_table << ['Hosts with at least one high severity issue',
                            hosts_with_high_severity_issue]
   percent_hosts_high_severity = sprintf "%.2f%%", 
-    (100 * hosts_with_high_severity_issue.to_f / scan.host_count)
+    (100 * hosts_with_high_severity_issue.to_f / total_hosts)
   output_table << ['% hosts with a high severity issue', 
                            percent_hosts_high_severity]
-  cvss_per_ip = sprintf "%.2f", aggregate_cvss_score / scan.host_count
-  output_table << ["CVSS / IP", cvss_per_ip]
 
   output_table.align_column(1, :right)
   output_table
