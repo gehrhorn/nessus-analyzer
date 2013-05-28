@@ -44,6 +44,8 @@ def calculate_statistics(scan)
   total_hosts = 0
   total_hosts += scan.host_count
 
+  aggregate_cvss_score = 0
+  aggreagte_ports = 0
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
   output_table << ['Total hosts', total_hosts]
@@ -54,8 +56,18 @@ def calculate_statistics(scan)
 
   scan.each_host do |host|
     hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
+
+    # host.ports always includes port 0, which I'm not interested in 
+    # so I decrement by one
+    aggreagte_ports += host.ports.length - 1
+    host.each_event do |event|
+      aggregate_cvss_score += event.cvss_base_score unless 
+        event.cvss_base_score == false
+    end
   end
 
+  ports_per_host = sprintf "%.2f", ( aggreagte_ports / scan.host_count )
+  output_table << ['Ports per host', ports_per_host]
   output_table.add_separator
   output_table << ['Hosts with at least one high severity issue',
                            hosts_with_high_severity_issue]
