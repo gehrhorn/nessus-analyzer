@@ -55,13 +55,18 @@ def calculate_statistics(scan)
     hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
 
     # host.ports always includes port 0, which I'm not interested in 
-    # so I decrement by one
-    aggreagte_ports += host.ports.length - 1
+    # so I decrement by one if it includes 0. This may not be necessary
+    # if because scan host.ports may always include 0
+    aggreagte_ports += host.ports.include?("0") ? 
+      (host.ports.length - 1) : host.ports.length
+    
     host.each_event do |event|
       aggregate_cvss_score += event.cvss_base_score unless 
         event.cvss_base_score == false
-    end
-  end
+    end # host
+
+  end # scan
+
   ports_per_host = sprintf "%.2f", ( aggreagte_ports / scan.host_count )
   output_table << ['Ports per host', ports_per_host]
   output_table.add_separator
