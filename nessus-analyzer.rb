@@ -77,6 +77,8 @@ def calculate_statistics(scan)
   ports_per_host = sprintf "%.2f", ( aggreagte_ports / scan.host_count )
   output_table << ['Ports per host', ports_per_host]
   output_table.add_separator
+  cvss_per_host = sprintf "%.2f", (aggregate_cvss_score / scan.host_count)
+  output_table << ['CVSS / Host', cvss_per_host]
   output_table << ['Hosts with at least one high severity issue',
                            hosts_with_high_severity_issue]
   percent_hosts_high_severity = sprintf "%.2f%%", 
