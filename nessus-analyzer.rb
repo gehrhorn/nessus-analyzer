@@ -41,12 +41,10 @@ end
 
 def calculate_statistics(scan)
   hosts_with_high_severity_issue = 0
-  total_hosts = 0
-  total_hosts += scan.host_count
 
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
-  output_table << ['Total hosts', total_hosts]
+  output_table << ['Total hosts', scan.host_count]
   output_table << ['High severity issues', scan.high_severity_count]
   output_table << ['Medium severity issues', scan.medium_severity_count]
   output_table << ['Low severity isseus', scan.low_severity_count]
@@ -60,7 +58,7 @@ def calculate_statistics(scan)
   output_table << ['Hosts with at least one high severity issue',
                            hosts_with_high_severity_issue]
   percent_hosts_high_severity = sprintf "%.2f%%", 
-    (100 * hosts_with_high_severity_issue.to_f / total_hosts)
+    (100 * hosts_with_high_severity_issue.to_f / scan.host_count)
   output_table << ['% hosts with a high severity issue', 
                            percent_hosts_high_severity]
 
