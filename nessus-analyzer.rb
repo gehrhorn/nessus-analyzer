@@ -59,7 +59,8 @@ def calculate_statistics(scan)
 
     # host.ports always includes port 0, which I'm not interested in 
     # so I decrement by one
-    aggreagte_ports += host.ports.length - 1
+    aggreagte_ports += host.ports.include?("0") ? 
+      host.ports.length - 1 : host.ports.length
     host.each_event do |event|
       aggregate_cvss_score += event.cvss_base_score unless 
         event.cvss_base_score == false
