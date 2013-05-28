@@ -9,6 +9,9 @@ require 'set'
 require 'trollop'
 
 def calculate_top_events(scan, event_count)
+  # Calculate the top event_count events from scan.
+  # Returns json output.
+
   # We're going to store the event details as a hash of hashes
   unique_events = Hash.new{|h, k| h[k] = {}}
   scan.each_host do |host|
@@ -40,6 +43,10 @@ def calculate_top_events(scan, event_count)
 end
 
 def calculate_statistics(scan)
+  # Calculate statistics and return a pretty table.
+  # Probably will refactor this to calc stats as separate functions so they
+  # can be sent to graphite / HUD.
+
   hosts_with_high_severity_issue = 0
   total_hosts = 0
   total_hosts += scan.host_count
@@ -82,6 +89,8 @@ def calculate_statistics(scan)
 end
 
 def find_hosts_by_id(scan, event_id)
+  # return an array of all hosts IPs that contain a certain event_id
+  # Use a set to prevent duplicates
   hosts = Set.new 
   scan.each_host do |host|
     next if host.total_event_count.zero?
@@ -93,16 +102,19 @@ def find_hosts_by_id(scan, event_id)
 end
 
 def process_nessus_file(nessus_file)
+  # deal with nessus_file per the Trollop opts that were set
   Nessus::Parse.new(nessus_file) do |scan|
     calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
-      puts calculate_statistics(scan) if @opts[:show_statistics]
+    puts calculate_statistics(scan) if @opts[:show_statistics]
     puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
   end
 end
 
 # main
 if __FILE__ == $PROGRAM_NAME
+  # determine options and call a file or dir.glob a list of files
+  # to the block
   @opts = Trollop::options do
     banner <<-EOS
     Nessus-Analyzer parses nessus output files.
