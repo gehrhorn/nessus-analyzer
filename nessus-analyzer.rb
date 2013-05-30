@@ -45,7 +45,7 @@ def calculate_top_events(scan, event_count)
 
 end
 
-def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts)
+def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts, events_per_host)
 
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
@@ -60,7 +60,7 @@ def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts
   output_table << ['Ports / host', sprintf("%.2f", ports_per_host)]
   output_table << ['% Hosts with a high severity issue', 
     sprintf("%.2f%%", high_severity_hosts)]
-
+  output_table << ['Events per host', sprintf("%.2f", events_per_host)]
   output_table.align_column(1, :right)
   output_table 
 
@@ -72,7 +72,7 @@ def calculate_statistics(scan)
   aggregate_cvss_score = 0
   aggregate_ports = 0
   high_severity_hosts = 0
-  
+  aggregate_event_count = 0
   scan.each_host do |host|
     host.each_event do |event| 
       aggregate_cvss_score += event.cvss_base_score unless
@@ -83,12 +83,16 @@ def calculate_statistics(scan)
     aggregate_ports += host.ports.length
 
     high_severity_hosts += 1 if host.high_severity_count > 0
-
+    # TODO: replace hackery with host.event_count when updated gemfile
+    tmpevents = host.low_severity_events.count + host.medium_severity_events.count + host.high_severity_events.count
+    aggregate_event_count += tmpevents 
   end
+   
   puts display_stats_table(scan, 
                            aggregate_cvss_score / scan.host_count,
                            aggregate_ports / scan.host_count,
-                           100 * ( high_severity_hosts.to_f / scan.host_count ))
+                           100 * ( high_severity_hosts.to_f / scan.host_count ),
+                          aggregate_event_count / scan.host_count.to_f)
 
 end
 
