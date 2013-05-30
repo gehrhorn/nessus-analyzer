@@ -120,7 +120,7 @@ def find_hosts_by_id(scan, event_id)
       hosts << host.ip if event.id == event_id
     end
   end
-  hosts.to_json
+  hosts.to_a
 end
 
 def process_nessus_file(nessus_file)
