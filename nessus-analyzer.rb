@@ -43,50 +43,68 @@ def calculate_top_events(scan, event_count)
   # sort the hash by v[:count] (descending) and then take event_count items
   unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_json
 end
+def calc_aggregate_cvss_score(scan)
+  # an aggregate_cvss_score is a proxy measure of overall risk. 
+  # We use this stat to roll-up to CVSS / Host to get a trend of 
+  # vulnerabilities over time
 
+  aggregate_cvss_score = 0
+  scan.each_host do |host|
+    host.each_event do |event|
+      aggregate_cvss_score += event.cvss_base_score unless
+        event.cvss_base_score == false
+    end
+  end
+  aggregate_cvss_score
+
+end
+
+def num_hosts_with_high_severity_issues(scan)
+  hosts_with_high_severity_issue = 0
+  scan.each_host do |host|
+    hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
+  end
+  hosts_with_high_severity_issue
+
+end
+def num_ports_per_host(scan)
+  aggreagte_ports = 0
+  scan.each_host do |host|
+    host.ports.delete("0")
+    aggreagte_ports += host.ports.length
+  end
+  aggreagte_ports / scan.host_count
+
+end
 def calculate_statistics(scan)
   # Calculate statistics and return a pretty table.
   # Probably will refactor this to calc stats as separate functions so they
   # can be sent to graphite / HUD.
 
-  hosts_with_high_severity_issue = 0
-  total_hosts = 0
-  total_hosts += scan.host_count
+  aggregate_cvss_score = calc_aggregate_cvss_score(scan)
+  high_severity_hosts = num_hosts_with_high_severity_issues(scan)
+  ports_per_host = sprintf "%.2f", num_ports_per_host(scan) 
 
-  aggregate_cvss_score = 0
-  aggreagte_ports = 0
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
-  output_table << ['Total hosts', total_hosts]
+  output_table << ['Total hosts', scan.host_count]
   output_table << ['High severity issues', scan.high_severity_count]
   output_table << ['Medium severity issues', scan.medium_severity_count]
   output_table << ['Low severity isseus', scan.low_severity_count]
-  output_table << ['Open ports', scan.open_ports_count]
 
-  scan.each_host do |host|
-    hosts_with_high_severity_issue += 1 if host.high_severity_count > 0
-
-    # host.ports always includes port 0, which I'm not interested in 
-    # so I decrement by one
-    aggreagte_ports += host.ports.include?("0") ? 
-      host.ports.length - 1 : host.ports.length
-    host.each_event do |event|
-      aggregate_cvss_score += event.cvss_base_score unless 
-        event.cvss_base_score == false
-    end
-  end
-
-  ports_per_host = sprintf "%.2f", ( aggreagte_ports / scan.host_count )
-  output_table << ['Ports per host', ports_per_host]
   output_table.add_separator
+
+  output_table << ['ports per host', ports_per_host]
+
   cvss_per_host = sprintf "%.2f", (aggregate_cvss_score / scan.host_count)
   output_table << ['CVSS / Host', cvss_per_host]
-  output_table << ['Hosts with at least one high severity issue',
-                           hosts_with_high_severity_issue]
-  percent_hosts_high_severity = sprintf "%.2f%%", 
-    (100 * hosts_with_high_severity_issue.to_f / total_hosts)
-  output_table << ['% hosts with a high severity issue', 
-                           percent_hosts_high_severity]
+
+  output_table << 
+    ['Hosts with at least one high severity issue', high_severity_hosts]
+  percent_hosts_high_severity = 
+    sprintf "%.2f%%", (100 * high_severity_hosts / scan.host_count)
+  output_table << 
+    ['% hosts with a high severity issue', percent_hosts_high_severity]
 
   output_table.align_column(1, :right)
   output_table
@@ -102,7 +120,7 @@ def find_hosts_by_id(scan, event_id)
       hosts << host.ip if event.id == event_id
     end
   end
-  hosts.to_a
+  hosts.to_json
 end
 
 def process_nessus_file(nessus_file)
