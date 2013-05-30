@@ -20,6 +20,8 @@ def calculate_top_events(scan, event_count)
       # at this point we don't care about informational
       next if event.informational?
 
+      # if the key exists increment the :count value by one
+      # otherwise create it and set the :count value to one
       if unique_events.has_key?(event.id)
         unique_events[event.id][:count] += 1
       else
@@ -38,8 +40,8 @@ def calculate_top_events(scan, event_count)
     end # host.each_event
   end # scan.each_host
 
-  # sort the hash by v[:count] (descending)
-  puts unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_json
+  # sort the hash by v[:count] (descending) and then take event_count items
+  unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_json
 end
 
 def calculate_statistics(scan)
@@ -106,7 +108,7 @@ end
 def process_nessus_file(nessus_file)
   # deal with nessus_file per the Trollop opts that were set
   Nessus::Parse.new(nessus_file) do |scan|
-    calculate_top_events(scan, @opts[:top_events]) unless 
+    puts calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
     puts calculate_statistics(scan) if @opts[:show_statistics]
     puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
@@ -136,6 +138,8 @@ if __FILE__ == $PROGRAM_NAME
       :type => Integer, :short => "-e"
   end
 
+  # Error handling. You have to spicify an action (stats, top x, etc.)
+  # and you have to set a file or directory (not both) to process
   Trollop::die :file, "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
   Trollop::die :dir, "Your directory must exist" unless 
@@ -147,8 +151,9 @@ if __FILE__ == $PROGRAM_NAME
 
   if @opts[:dir]
     path = @opts[:dir].dup
-    path << '/' if path[-1] != '/' # end in a slash
+    path << '/' if path[-1] != '/' # always end in a slash
     Dir.glob(path+'*.nessus') do |report_file|
+      # we process directories as a series of files
       process_nessus_file report_file
     end
   elsif @opts[:file]
