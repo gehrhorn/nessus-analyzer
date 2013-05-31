@@ -2,7 +2,7 @@
 
 $LOAD_PATH << 'lib'
 require 'rubygems'
-require 'ruby-nessus'
+require 'nessus'
 require 'terminal-table'
 require 'json'
 require 'set'
@@ -84,8 +84,9 @@ def calculate_statistics(scan)
 
     high_severity_hosts += 1 if host.high_severity_count > 0
     # TODO: replace hackery with host.event_count when updated gemfile
-    tmpevents = host.low_severity_events.count + host.medium_severity_events.count + host.high_severity_events.count
-    aggregate_event_count += tmpevents 
+    aggregate_event_count += host.event_count
+    # tmpevents = host.low_severity_events.count + host.medium_severity_events.count + host.high_severity_events.count
+    # aggregate_event_count += tmpevents 
   end
    
   puts display_stats_table(scan, 
