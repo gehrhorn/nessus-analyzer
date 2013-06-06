@@ -4,13 +4,15 @@ $LOAD_PATH << 'lib'
 require 'rubygems'
 require 'nessus'
 require 'terminal-table'
-require 'json'
+require 'yaml'
 require 'set'
 require 'trollop'
+require 'socket'
+require 'pp'
 
 def calculate_top_events(scan, event_count)
   # Calculate the top event_count events from scan.
-  # Returns json output.
+  # Returns yaml output.
 
   # We're going to store the event details as a hash of hashes
   unique_events = Hash.new{|h, k| h[k] = {}}
@@ -41,7 +43,7 @@ def calculate_top_events(scan, event_count)
   end # scan.each_host
 
   # sort the hash by v[:count] (descending) and then take event_count items
-  unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_json
+  unique_events.sort_by{|k, v| -v[:count]}.take(event_count).to_yaml
 
 end
 
@@ -66,9 +68,31 @@ def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts
 
 end
 
+def send_graphite_stats(cvss_per_host, ports_per_host, high_severity_hosts, events_per_host)
+  unless @opts[:timestamp]
+    # if :timestamp isn't defined we'll use the most recent midnight
+    now = Time.new
+    @opts[:timestamp] = Time.new(now.year, now.month, now.day, 0,0,0).to_i
+  end
+  
+  begin 
+    graphite_socket = TCPSocket.open(@opts[:graphite_server], 2003)
+  rescue
+    # write the error message if we can't open the socket
+    puts "Died with #{$!}"
+    exit
+  else
+    # write to graphite here
+    graphite_socket.write("#{@opts[:graphite_metric]}.cvssperhost #{cvss_per_host} #{@opts[:timestamp]}\n")
+    graphite_socket.write("#{@opts[:graphite_metric]}.portsperhost #{ports_per_host} #{@opts[:timestamp]}\n")
+    graphite_socket.write("#{@opts[:graphite_metric]}.highseverityhosts #{high_severity_hosts} #{@opts[:timestamp]}\n")
+    graphite_socket.write("#{@opts[:graphite_metric]}.eventsperhost #{events_per_host} #{@opts[:timestamp]}\n")
+    graphite_socket.close
+  end
+end
+
 def calculate_statistics(scan)
   # calculate some stats. 
-  # TODO: send to HUD, right now it just prints a pretty table
   aggregate_cvss_score = 0
   aggregate_ports = 0
   high_severity_hosts = 0
@@ -83,10 +107,7 @@ def calculate_statistics(scan)
     aggregate_ports += host.ports.length
 
     high_severity_hosts += 1 if host.high_severity_count > 0
-    # TODO: replace hackery with host.event_count when updated gemfile
     aggregate_event_count += host.event_count
-    # tmpevents = host.low_severity_events.count + host.medium_severity_events.count + host.high_severity_events.count
-    # aggregate_event_count += tmpevents 
   end
    
   puts display_stats_table(scan, 
@@ -94,7 +115,11 @@ def calculate_statistics(scan)
                            aggregate_ports / scan.host_count,
                            100 * ( high_severity_hosts.to_f / scan.host_count ),
                           aggregate_event_count / scan.host_count.to_f)
-
+  
+  send_graphite_stats(aggregate_cvss_score / scan.host_count,
+                      aggregate_ports / scan.host_count,
+                      100 * ( high_severity_hosts.to_f / scan.host_count ),
+                      aggregate_event_count / scan.host_count.to_f) if @opts[:graphite_server]
 end
 
 def find_hosts_by_id(scan, event_id)
@@ -127,13 +152,12 @@ if __FILE__ == $PROGRAM_NAME
   @opts = Trollop::options do
     banner <<-EOS
     Nessus-Analyzer parses nessus output files.
-    Usage:
-      ./nessus-analyzer.rb [options] [file/directory]
+    Usage: ./nessus-analyzer.rb [options] [file/directory]
     where [options] are:
     EOS
 
     opt :top_events, "The <i> most common events", :type => Integer, 
-      :short => "-t"
+      :short => "-n"
     opt :show_statistics, "Show report statistic", :short => "-s"
     opt :file, "The .nessus file you want to process", :type => String, 
       :short => "-f"
@@ -141,6 +165,12 @@ if __FILE__ == $PROGRAM_NAME
       :type => String, :short => "-d"
     opt :event_id, "Show all hosts that match the supplied id", 
       :type => Integer, :short => "-e"
+    opt :graphite_server, "The graphite server you want to send data to",
+      :type => String, :short  => "-g"
+    opt :graphite_metric, "The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to",
+      :type => String, :short  => "-m"
+    opt :timestamp, "Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.",
+      :type  => Integer, :short => "-t"
   end
 
   # Error handling. You have to spicify an action (stats, top x, etc.)
@@ -153,6 +183,10 @@ if __FILE__ == $PROGRAM_NAME
     @opts[:file] && @opts[:dir]
   Trollop::die :file, "You need to specify a file or directory" if 
     @opts[:file].nil? && @opts[:dir].nil?
+  Trollop::die :graphite_server, "You need to use --show-statistics or -s if you're sending data to graphite" if
+    @opts[:graphite_server] && !@opts[:show_statistics]
+  Trollop::die :graphite_server, "You need to specify a metric (-m) to send to graphite" if
+    @opts[:graphite_metric].nil? && @opts[:graphite_server]
 
   if @opts[:dir]
     path = @opts[:dir].dup
