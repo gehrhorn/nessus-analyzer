@@ -85,7 +85,7 @@ Options:
 ```yaml
 ./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -n 5
 - - 33929
-- :count: 945
+  - :count: 945
   :name: PCI DSS compliance
   :severity: 3
   :severity_in_words: High Severity
