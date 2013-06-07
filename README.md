@@ -33,7 +33,7 @@ Options:
 ``` 
  ./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -s
  +------------------------------------------+---------------+
- |              BO3_VLAN27_VLAN28 (scheduled)               |
+|                   SCAN TITLE GOES HERE                   |
  +------------------------------------------+---------------+
  | Total hosts                              |           826 |
  | High severity issues                     |          1547 |
@@ -50,7 +50,7 @@ Options:
 ```
 ./nessus-analyzer.rb -d /data/nessus-analyzer-data -s
 +------------------------------------------+---------------+
-|         BO3_VLAN_30_35_40_75_130_190 (scheduled)         |
+|                   SCAN TITLE GOES HERE                   |
 +------------------------------------------+---------------+
 | Total hosts                              |           122 |
 | High severity issues                     |           271 |
@@ -64,7 +64,7 @@ Options:
 +------------------------------------------+---------------+
 
 +-------------------------------------------+--------------+
-|              BO3_VLAN27_VLAN28 (scheduled)               |
+|                   SCAN TITLE GOES HERE                   |
 +-------------------------------------------+--------------+
 | Total hosts                               |            1 |
 | High severity issues                      |            0 |
