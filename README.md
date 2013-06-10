@@ -33,7 +33,7 @@ Options:
 ``` 
  ./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -s
  +------------------------------------------+---------------+
-|                   SCAN TITLE GOES HERE                   |
+ |                   SCAN TITLE GOES HERE                   |
  +------------------------------------------+---------------+
  | Total hosts                              |           826 |
  | High severity issues                     |          1547 |
