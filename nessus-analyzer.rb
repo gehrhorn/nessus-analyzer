@@ -5,6 +5,7 @@ require 'rubygems'
 require 'nessus'
 require 'terminal-table'
 require 'yaml'
+require 'json'
 require 'set'
 require 'trollop'
 require 'socket'
@@ -135,6 +136,38 @@ def find_hosts_by_id(scan, event_id)
   hosts.to_a
 end
 
+def make_mongo_doc(scan)
+  mongo_hash = Hash.new
+  mongo_hash[:title] = scan.title
+  mongo_hash[:host_count] = scan.host_count
+  scan.each_host do |host|
+    mongo_hash[host.to_s] = Hash.new
+    mongo_hash[host.to_s][:ip] = host.to_s
+    mongo_hash[host.to_s][:hostname] = host.hostname
+    mongo_hash[host.to_s][:mac_addr] = host.mac_addr
+    mongo_hash[host.to_s][:os_name] = host.os_name
+    mongo_hash[host.to_s][:open_ports] = host.open_ports
+    mongo_hash[host.to_s][:event_count] = host.event_count
+
+    host.each_event do |event|
+      mongo_hash[host.to_s][event.plugin_id] = Hash.new
+      mongo_hash[host.to_s][event.plugin_id][:port] = event.port
+      mongo_hash[host.to_s][event.plugin_id][:severity] = event.severity
+      mongo_hash[host.to_s][event.plugin_id][:plugin_id] = event.plugin_id
+      mongo_hash[host.to_s][event.plugin_id][:family] = event.family
+      mongo_hash[host.to_s][event.plugin_id][:plugin_name] = event.plugin_name
+      mongo_hash[host.to_s][event.plugin_id][:description] = event.description
+      mongo_hash[host.to_s][event.plugin_id][:risk] = event.risk
+      mongo_hash[host.to_s][event.plugin_id][:output] = event.output
+      mongo_hash[host.to_s][event.plugin_id][:patch_publication_date] = event.patch_publication_date.to_s
+      mongo_hash[host.to_s][event.plugin_id][:cvss_base_score] = event.cvss_base_score
+      mongo_hash[host.to_s][event.plugin_id][:cve] = event.cve
+      mongo_hash[host.to_s][event.plugin_id][:cvss_vector] = event.cvss_vector
+    end
+  end
+  mongo_hash.to_json
+end
+
 def process_nessus_file(nessus_file)
   # deal with nessus_file per the Trollop opts that were set
   Nessus::Parse.new(nessus_file) do |scan|
@@ -142,6 +175,7 @@ def process_nessus_file(nessus_file)
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
     puts calculate_statistics(scan) if @opts[:show_statistics]
     puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
+    pp make_mongo_doc(scan) if @opts[:mongo]
   end
 end
 
@@ -152,17 +186,15 @@ if __FILE__ == $PROGRAM_NAME
   @opts = Trollop::options do
     banner <<-EOS
     Nessus-Analyzer parses nessus output files.
-    Usage: ./nessus-analyzer.rb [options] [file/directory]
+    Usage: ./nessus-analyzer.rb [options] -f file
     where [options] are:
     EOS
 
+    opt :file, "The .nessus file you want to process", :type => String, 
+      :short => "-f"
     opt :top_events, "The <i> most common events", :type => Integer, 
       :short => "-n"
     opt :show_statistics, "Show report statistic", :short => "-s"
-    opt :file, "The .nessus file you want to process", :type => String, 
-      :short => "-f"
-    opt :dir, "The directory containing .nessus files you want to process", 
-      :type => String, :short => "-d"
     opt :event_id, "Show all hosts that match the supplied id", 
       :type => Integer, :short => "-e"
     opt :graphite_server, "The graphite server you want to send data to",
@@ -171,32 +203,22 @@ if __FILE__ == $PROGRAM_NAME
       :type => String, :short  => "-m"
     opt :timestamp, "Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.",
       :type  => Integer, :short => "-t"
+    opt :mongo, "Turn a scan into a MongoDB document", :short => "-d"
   end
 
   # Error handling. You have to spicify an action (stats, top x, etc.)
   # and you have to set a file or directory (not both) to process
-  Trollop::die :file, "must exist" unless 
+  Trollop::die :file, 
+    "required argument" unless @opts[:file]
+  Trollop::die :file, 
+    "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
-  Trollop::die :dir, "Your directory must exist" unless 
-    Dir.exist?(@opts[:dir]) if @opts[:dir] 
-  Trollop::die :dir, "You can't specify a file and directory" if 
-    @opts[:file] && @opts[:dir]
-  Trollop::die :file, "You need to specify a file or directory" if 
-    @opts[:file].nil? && @opts[:dir].nil?
-  Trollop::die :graphite_server, "You need to use --show-statistics or -s if you're sending data to graphite" if
+  Trollop::die :graphite_server, 
+    "You need to use --show-statistics or -s if you're sending data to graphite" if
     @opts[:graphite_server] && !@opts[:show_statistics]
-  Trollop::die :graphite_server, "You need to specify a metric (-m) to send to graphite" if
+  Trollop::die :graphite_server, 
+    "You need to specify a metric (-m) to send to graphite" if
     @opts[:graphite_metric].nil? && @opts[:graphite_server]
 
-  if @opts[:dir]
-    path = @opts[:dir].dup
-    path << '/' if path[-1] != '/' # always end in a slash
-    Dir.glob(path+'*.nessus') do |report_file|
-      # we process directories as a series of files
-      process_nessus_file report_file
-    end
-  elsif @opts[:file]
-    report_file = @opts[:file]  
-    process_nessus_file report_file
-  end
+  process_nessus_file @opts[:file] 
 end
