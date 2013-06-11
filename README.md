@@ -20,11 +20,11 @@ Options:
         --top-events, -n <i>:   The <i> most common events
         --show-statistics, -s:   Show report statistic
         --file, -f <s>:   The .nessus file you want to process
-        --dir, -d <s>:   The directory containing .nessus files you want to process
         --event-id, -e <i>:   Show all hosts that match the supplied id
         --graphite-server, -g <s>:   The graphite server you want to send data to
         --graphite-metric, -m <s>:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
         --timestamp, -t <i>:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
+        --mongo, -d: Prepare statistics for storing in mongo
         --help, -h:   Show this message
 ```
 
@@ -45,37 +45,6 @@ Options:
  | % Hosts with a high severity issue       |        88.01% |
  | Events per host                          |         12.83 |
  +------------------------------------------+---------------+
-```
-### Running statistics of an entire directory
-```
-./nessus-analyzer.rb -d /data/nessus-analyzer-data -s
-+------------------------------------------+---------------+
-|                   SCAN TITLE GOES HERE                   |
-+------------------------------------------+---------------+
-| Total hosts                              |           122 |
-| High severity issues                     |           271 |
-| Medium severity issues                   |          1125 |
-| Low severity isseus                      |           201 |
-+------------------------------------------+---------------+
-| CVSS / host                              |         58.05 |
-| Ports / host                             |         15.00 |
-| % Hosts with a high severity issue       |        82.79% |
-| Events per host                          |         13.09 |
-+------------------------------------------+---------------+
-
-+-------------------------------------------+--------------+
-|                   SCAN TITLE GOES HERE                   |
-+-------------------------------------------+--------------+
-| Total hosts                               |            1 |
-| High severity issues                      |            0 |
-| Medium severity issues                    |            5 |
-| Low severity isseus                       |            0 |
-+-------------------------------------------+--------------+
-| CVSS / host                               |        50.00 |
-| Ports / host                              |         1.00 |
-| % Hosts with a high severity issue        |        0.00% |
-| Events per host                           |         5.00 |
-+-------------------------------------------+--------------+
 ```
 ### Running stats and sending them to graphite
 ```
