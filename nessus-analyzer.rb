@@ -164,7 +164,6 @@ def make_mongo_doc(scan)
       host_details[:events] << event_details
     end
     scan_results << host_details
-    File.open("#{host.to_s}.out", 'w') { |file| file.write(host_details) }
     pp host_details
   end
   scan_results
