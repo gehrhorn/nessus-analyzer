@@ -23,7 +23,7 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
   --event-id, -e &lt;i&gt;:   Show all hosts that match the supplied id
   --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
   --graphite-metric, -m &lt;s&gt;:   The root graphite metric to send data to
-  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
+  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date.
   --mongo, -d: Turn a file into a document that can be imported into mongo
   --help, -h:   Show this message
 ```
