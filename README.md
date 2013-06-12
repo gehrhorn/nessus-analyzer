@@ -17,13 +17,13 @@ Options:
 Nessus-Analyzer parses nessus output files.
 Usage: ./nessus-analyzer.rb [options] -f report.nessus 
   where [options] are:
-  --file, -f &lt;s&gt;:   The .nessus file you want to process
-  --top-events, -n &lt;i&gt;:   The &lt;i&gt; most common events
+  --file, -f <s>:   The .nessus file you want to process
+  --top-events, -n <i>:   The <i> most common events
   --show-statistics, -s:   Show report statistic
-  --event-id, -e &lt;i&gt;:   Show all hosts that match the supplied id
-  --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
-  --graphite-metric, -m &lt;s&gt;:   The root graphite metric to send data to
-  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date.
+  --event-id, -e <i>:   Show all hosts that match the supplied id
+  --graphite-server, -g <s>:   The graphite server you want to send data to
+  --graphite-metric, -m <s>:   The root graphite metric to send data to
+  --timestamp, -t <i>:   Graphite timestamp, defaults midnight of the current date.
   --mongo, -d: Turn a file into a document that can be imported into mongo
   --help, -h:   Show this message
 ```
