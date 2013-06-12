@@ -7,8 +7,6 @@ Every time you run the analyzer you need to supply two options:
 2. The action you want to take (find top events, show stats, send to graphite, etc)
 
 ```
-Options:
-Nessus-Analyzer parses nessus output files.
 Usage: ./nessus-analyzer.rb [options] -f report.nessus 
   where [options] are:
   --file, -f <s>:   The .nessus file you want to process
