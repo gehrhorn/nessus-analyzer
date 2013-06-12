@@ -1,11 +1,5 @@
 # Tool to analyze Nessus output
 
-Make sure you have [ruby-nessus](https://github.com/mephux/ruby-nessus) installed from [source](https://github.com/mephux/ruby-nessus) or via a [gem](http://rubygems.org/gems/ruby-nessus). You can include ruby-nessus with:
-
-```
-require 'nessus'
-```
-
 ## Running the analyzer
 Every time you run the analyzer you need to supply two options:
 
@@ -93,4 +87,11 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
    :cvss_vector: CVSS2#AV:N/AC:H/Au:N/C:P/I:N/A:N
 ...
 ```
+
+Make sure you have [ruby-nessus](https://github.com/mephux/ruby-nessus) installed from [source](https://github.com/mephux/ruby-nessus) or via a [gem](http://rubygems.org/gems/ruby-nessus). You can include ruby-nessus with:
+
+```
+require 'nessus'
+```
+
 :beers:
