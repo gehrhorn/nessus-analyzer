@@ -9,23 +9,23 @@ require 'nessus'
 ## Running the analyzer
 Every time you run the analyzer you need to supply two options:
 
-1. The file or directory of files that you want to analyze (never both).
+1. The file or you want to analyze.
 2. The action you want to take (find top events, show stats, send to graphite, etc)
 
 ```
 Options:
-    Nessus-Analyzer parses nessus output files.
-      Usage: ./nessus-analyzer.rb [options] [file/directory]
-        where [options] are:
-        --top-events, -n <i>:   The <i> most common events
-        --show-statistics, -s:   Show report statistic
-        --file, -f <s>:   The .nessus file you want to process
-        --event-id, -e <i>:   Show all hosts that match the supplied id
-        --graphite-server, -g <s>:   The graphite server you want to send data to
-        --graphite-metric, -m <s>:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
-        --timestamp, -t <i>:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
-        --mongo, -d: Prepare statistics for storing in mongo
-        --help, -h:   Show this message
+Nessus-Analyzer parses nessus output files.
+Usage: ./nessus-analyzer.rb [options] -f report.nessus 
+  where [options] are:
+  --file, -f &lt;s&gt;:   The .nessus file you want to process
+  --top-events, -n &lt;i&gt;:   The &lt;i&gt; most common events
+  --show-statistics, -s:   Show report statistic
+  --event-id, -e &lt;i&gt;:   Show all hosts that match the supplied id
+  --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
+  --graphite-metric, -m &lt;s&gt;:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
+  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
+  --mongo, -d: Turn a file into a document that can be imported into mongo
+  --help, -h:   Show this message
 ```
 
 ## Examples
