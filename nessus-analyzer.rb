@@ -123,19 +123,6 @@ def calculate_statistics(scan)
                       aggregate_event_count / scan.host_count.to_f) if @opts[:graphite_server]
 end
 
-def find_hosts_by_id(scan, event_id)
-  # return an array of all hosts IPs that contain a certain event_id
-  # Use a set to prevent duplicates
-  hosts = Set.new 
-  scan.each_host do |host|
-    next if host.total_event_count.zero?
-    host.each_event do |event|
-      hosts << host.ip if event.id == event_id
-    end
-  end
-  hosts.to_a
-end
-
 def make_mongo_doc(scan)
   scan_results = Array.new
   scan.each_host do |host|
@@ -164,10 +151,9 @@ def make_mongo_doc(scan)
       host_details[:events] << event_details
     end
     scan_results << host_details
-    pp host_details
   end
+
   scan_results
-  nil
 end
 
 def process_nessus_file(nessus_file)
@@ -197,8 +183,6 @@ if __FILE__ == $PROGRAM_NAME
     opt :top_events, "The <i> most common events", :type => Integer, 
       :short => "-n"
     opt :show_statistics, "Show report statistic", :short => "-s"
-    opt :event_id, "Show all hosts that match the supplied id", 
-      :type => Integer, :short => "-e"
     opt :graphite_server, "The graphite server you want to send data to",
       :type => String, :short  => "-g"
     opt :graphite_metric, "The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to",

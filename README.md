@@ -12,7 +12,6 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
   --file, -f <s>:   The .nessus file you want to process
   --top-events, -n <i>:   The <i> most common events
   --show-statistics, -s:   Show report statistic
-  --event-id, -e <i>:   Show all hosts that match the supplied id
   --graphite-server, -g <s>:   The graphite server you want to send data to
   --graphite-metric, -m <s>:   The root graphite metric to send data to
   --timestamp, -t <i>:   Graphite timestamp, defaults midnight of the current date.
