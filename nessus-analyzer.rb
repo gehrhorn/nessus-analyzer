@@ -10,6 +10,8 @@ require 'set'
 require 'trollop'
 require 'socket'
 require 'pp'
+require 'mongo'
+require 'bson'
 
 def calculate_top_events(scan, event_count)
   # Calculate the top event_count events from scan.
@@ -111,16 +113,16 @@ def calculate_statistics(scan)
     aggregate_event_count += host.event_count
   end
    
-  puts display_stats_table(scan, 
-                           aggregate_cvss_score / scan.host_count,
-                           aggregate_ports / scan.host_count,
-                           100 * ( high_severity_hosts.to_f / scan.host_count ),
-                          aggregate_event_count / scan.host_count.to_f)
-  
   send_graphite_stats(aggregate_cvss_score / scan.host_count,
                       aggregate_ports / scan.host_count,
                       100 * ( high_severity_hosts.to_f / scan.host_count ),
                       aggregate_event_count / scan.host_count.to_f) if @opts[:graphite_server]
+
+  return display_stats_table(scan, 
+                      aggregate_cvss_score / scan.host_count,
+                      aggregate_ports / scan.host_count,
+                      100 * ( high_severity_hosts.to_f / scan.host_count ),
+                      aggregate_event_count / scan.host_count.to_f)
 end
 
 def make_mongo_doc(scan)
@@ -162,8 +164,7 @@ def process_nessus_file(nessus_file)
     puts calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
     puts calculate_statistics(scan) if @opts[:show_statistics]
-    puts find_hosts_by_id(scan, @opts[:event_id]) if @opts[:event_id]
-    pp make_mongo_doc(scan) if @opts[:mongo]
+    puts make_mongo_doc(scan) if @opts[:mongo]
   end
 end
 
