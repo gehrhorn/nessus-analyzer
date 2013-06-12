@@ -34,10 +34,6 @@
           <h1>
 <a name="tool-to-analyze-nessus-output" class="anchor" href="#tool-to-analyze-nessus-output"><span class="octicon octicon-link"></span></a>Tool to analyze Nessus output</h1>
 
-<p>Make sure you have <a href="https://github.com/mephux/ruby-nessus">ruby-nessus</a> installed from <a href="https://github.com/mephux/ruby-nessus">source</a> or via a <a href="http://rubygems.org/gems/ruby-nessus">gem</a>. You can include ruby-nessus with:</p>
-
-<pre><code>require 'nessus'
-</code></pre>
 
 <h2>
 <a name="running-the-analyzer" class="anchor" href="#running-the-analyzer"><span class="octicon octicon-link"></span></a>Running the analyzer</h2>
@@ -85,42 +81,11 @@
 </code></pre>
 
 <h3>
-<a name="running-statistics-of-an-entire-directory" class="anchor" href="#running-statistics-of-an-entire-directory"><span class="octicon octicon-link"></span></a>Running statistics of an entire directory</h3>
-
-<pre><code>./nessus-analyzer.rb -d /data/nessus-analyzer-data -s
-+------------------------------------------+---------------+
-|                   SCAN TITLE GOES HERE                   |
-+------------------------------------------+---------------+
-| Total hosts                              |           122 |
-| High severity issues                     |           271 |
-| Medium severity issues                   |          1125 |
-| Low severity isseus                      |           201 |
-+------------------------------------------+---------------+
-| CVSS / host                              |         58.05 |
-| Ports / host                             |         15.00 |
-| % Hosts with a high severity issue       |        82.79% |
-| Events per host                          |         13.09 |
-+------------------------------------------+---------------+
-
-+-------------------------------------------+--------------+
-|                   SCAN TITLE GOES HERE                   |
-+-------------------------------------------+--------------+
-| Total hosts                               |            1 |
-| High severity issues                      |            0 |
-| Medium severity issues                    |            5 |
-| Low severity isseus                       |            0 |
-+-------------------------------------------+--------------+
-| CVSS / host                               |        50.00 |
-| Ports / host                              |         1.00 |
-| % Hosts with a high severity issue        |        0.00% |
-| Events per host                           |         5.00 |
-+-------------------------------------------+--------------+
-</code></pre>
 
 <h3>
 <a name="running-stats-and-sending-them-to-graphite" class="anchor" href="#running-stats-and-sending-them-to-graphite"><span class="octicon octicon-link"></span></a>Running stats and sending them to graphite</h3>
 
-<pre><code>./nessus-analyzer.rb -f /data/nessus-analyzer-data/report_10s.nessus -s -g devgraphite -m stats.security.prodweb
+<pre><code>./nessus-analyzer.rb -f report.nessus -s -g graphite -m path.to.metric
 </code></pre>
 
 <h3>
@@ -168,6 +133,10 @@
 <span class="nn">...</span>
 </pre></div>
 
+<p>Make sure you have <a href="https://github.com/mephux/ruby-nessus">ruby-nessus</a> installed from <a href="https://github.com/mephux/ruby-nessus">source</a> or via a <a href="http://rubygems.org/gems/ruby-nessus">gem</a>. You can include ruby-nessus with:</p>
+
+<pre><code>require 'nessus'
+</code></pre>
 <p><img class="emoji" title=":beers:" alt=":beers:" src="https://a248.e.akamai.net/assets.github.com/images/icons/emoji/beers.png" height="20" width="20" align="absmiddle"></p>
         </section>
 
