@@ -22,7 +22,7 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
   --show-statistics, -s:   Show report statistic
   --event-id, -e &lt;i&gt;:   Show all hosts that match the supplied id
   --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
-  --graphite-metric, -m &lt;s&gt;:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
+  --graphite-metric, -m &lt;s&gt;:   The root graphite metric to send data to
   --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
   --mongo, -d: Turn a file into a document that can be imported into mongo
   --help, -h:   Show this message
@@ -31,7 +31,7 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
 ## Examples
 ### Running statistics of one scan
 ``` 
- ./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -s
+ ./nessus-analyzer.rb -f report.nessus -s
  +------------------------------------------+---------------+
  |                   SCAN TITLE GOES HERE                   |
  +------------------------------------------+---------------+
@@ -48,11 +48,11 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
 ```
 ### Running stats and sending them to graphite
 ```
-./nessus-analyzer.rb -f /data/nessus-analyzer-data/report_10s.nessus -s -g devgraphite -m stats.security.prodweb
+./nessus-analyzer.rb -f report.nessus -s -g devgraphite -m stats.security.prodweb
 ```
 ### Getting the top 5 events in a scan
 ```yaml
-./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -n 5
+./nessus-analyzer.rb -f report.nessus -n 5
 - - 33929
   - :count: 945
   :name: PCI DSS compliance
