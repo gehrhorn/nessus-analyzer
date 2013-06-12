@@ -137,35 +137,35 @@ def find_hosts_by_id(scan, event_id)
 end
 
 def make_mongo_doc(scan)
-  mongo_hash = Hash.new
-  mongo_hash[:title] = scan.title
-  mongo_hash[:host_count] = scan.host_count
+  # mongo_hash = Hash.new
+  # mongo_hash[:title] = scan.title
+  # mongo_hash[:host_count] = scan.host_count
+  scan_results = Array.new
   scan.each_host do |host|
-    mongo_hash[host.to_s] = Hash.new
-    mongo_hash[host.to_s][:ip] = host.to_s
-    mongo_hash[host.to_s][:hostname] = host.hostname
-    mongo_hash[host.to_s][:mac_addr] = host.mac_addr
-    mongo_hash[host.to_s][:os_name] = host.os_name
-    mongo_hash[host.to_s][:open_ports] = host.open_ports
-    mongo_hash[host.to_s][:event_count] = host.event_count
-
-    host.each_event do |event|
-      mongo_hash[host.to_s][event.plugin_id] = Hash.new
-      mongo_hash[host.to_s][event.plugin_id][:port] = event.port
-      mongo_hash[host.to_s][event.plugin_id][:severity] = event.severity
-      mongo_hash[host.to_s][event.plugin_id][:plugin_id] = event.plugin_id
-      mongo_hash[host.to_s][event.plugin_id][:family] = event.family
-      mongo_hash[host.to_s][event.plugin_id][:plugin_name] = event.plugin_name
-      mongo_hash[host.to_s][event.plugin_id][:description] = event.description
-      mongo_hash[host.to_s][event.plugin_id][:risk] = event.risk
-      mongo_hash[host.to_s][event.plugin_id][:output] = event.output
-      mongo_hash[host.to_s][event.plugin_id][:patch_publication_date] = event.patch_publication_date.to_s
-      mongo_hash[host.to_s][event.plugin_id][:cvss_base_score] = event.cvss_base_score
-      mongo_hash[host.to_s][event.plugin_id][:cve] = event.cve
-      mongo_hash[host.to_s][event.plugin_id][:cvss_vector] = event.cvss_vector
-    end
+    scan_data = Hash.new
+    scan_data[:ip] = host.to_s
+    scan_data[:hostname] = host.hostname
+    scan_data[:mac_addr] = host.mac_addr
+    scan_data[:os_name] = host.os_name
+    scan_data[:open_ports] = host.open_ports
+    scan_data[:event_count] = host.event_count
+    scan_results << scan_data    
+    #   mongo_hash[host.to_s][event.plugin_id] = Hash.new
+    #   mongo_hash[host.to_s][event.plugin_id][:port] = event.port
+    #   mongo_hash[host.to_s][event.plugin_id][:severity] = event.severity
+    #   mongo_hash[host.to_s][event.plugin_id][:plugin_id] = event.plugin_id
+    #   mongo_hash[host.to_s][event.plugin_id][:family] = event.family
+    #   mongo_hash[host.to_s][event.plugin_id][:plugin_name] = event.plugin_name
+    #   mongo_hash[host.to_s][event.plugin_id][:description] = event.description
+    #   mongo_hash[host.to_s][event.plugin_id][:risk] = event.risk
+    #   mongo_hash[host.to_s][event.plugin_id][:output] = event.output
+    #   mongo_hash[host.to_s][event.plugin_id][:patch_publication_date] = event.patch_publication_date.to_s
+    #   mongo_hash[host.to_s][event.plugin_id][:cvss_base_score] = event.cvss_base_score
+    #   mongo_hash[host.to_s][event.plugin_id][:cve] = event.cve
+    #   mongo_hash[host.to_s][event.plugin_id][:cvss_vector] = event.cvss_vector
+    # end
   end
-  mongo_hash.to_json
+  scan_results
 end
 
 def process_nessus_file(nessus_file)
