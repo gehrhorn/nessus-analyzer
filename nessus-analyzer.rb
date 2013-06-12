@@ -137,35 +137,38 @@ def find_hosts_by_id(scan, event_id)
 end
 
 def make_mongo_doc(scan)
-  # mongo_hash = Hash.new
-  # mongo_hash[:title] = scan.title
-  # mongo_hash[:host_count] = scan.host_count
   scan_results = Array.new
   scan.each_host do |host|
-    scan_data = Hash.new
-    scan_data[:ip] = host.to_s
-    scan_data[:hostname] = host.hostname
-    scan_data[:mac_addr] = host.mac_addr
-    scan_data[:os_name] = host.os_name
-    scan_data[:open_ports] = host.open_ports
-    scan_data[:event_count] = host.event_count
-    scan_results << scan_data    
-    #   mongo_hash[host.to_s][event.plugin_id] = Hash.new
-    #   mongo_hash[host.to_s][event.plugin_id][:port] = event.port
-    #   mongo_hash[host.to_s][event.plugin_id][:severity] = event.severity
-    #   mongo_hash[host.to_s][event.plugin_id][:plugin_id] = event.plugin_id
-    #   mongo_hash[host.to_s][event.plugin_id][:family] = event.family
-    #   mongo_hash[host.to_s][event.plugin_id][:plugin_name] = event.plugin_name
-    #   mongo_hash[host.to_s][event.plugin_id][:description] = event.description
-    #   mongo_hash[host.to_s][event.plugin_id][:risk] = event.risk
-    #   mongo_hash[host.to_s][event.plugin_id][:output] = event.output
-    #   mongo_hash[host.to_s][event.plugin_id][:patch_publication_date] = event.patch_publication_date.to_s
-    #   mongo_hash[host.to_s][event.plugin_id][:cvss_base_score] = event.cvss_base_score
-    #   mongo_hash[host.to_s][event.plugin_id][:cve] = event.cve
-    #   mongo_hash[host.to_s][event.plugin_id][:cvss_vector] = event.cvss_vector
-    # end
+    host_details = Hash.new
+    host_details[:ip] = host.to_s
+    host_details[:hostname] = host.hostname
+    host_details[:mac_addr] = host.mac_addr
+    host_details[:os_name] = host.os_name
+    host_details[:open_ports] = host.open_ports
+    host_details[:event_count] = host.event_count
+    host_details[:events] = Array.new
+    host.each_event do |event|
+      event_details = Hash.new
+      event_details[:severity] = event.severity
+      event_details[:plugin_id] = event.plugin_id
+      event_details[:port] = event.port
+      event_details[:family] = event.family
+      event_details[:plugin_name] = event.plugin_name
+      event_details[:description] = event.description
+      event_details[:risk] = event.risk
+      event_details[:output] = event.output
+      event_details[:patch_publication_date] = event.patch_publication_date.to_s
+      event_details[:cvss_base_score] = event.cvss_base_score
+      event_details[:cve] = event.cve
+      event_details[:cvss_vector] = event.cvss_vector
+      host_details[:events] << event_details
+    end
+    scan_results << host_details
+    File.open("#{host.to_s}.out", 'w') { |file| file.write(host_details) }
+    pp host_details
   end
   scan_results
+  nil
 end
 
 def process_nessus_file(nessus_file)
