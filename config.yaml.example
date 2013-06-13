@@ -1,0 +1,11 @@
+development:
+  server:     devmongo
+  port:       27017
+  database:   nessus
+  collection: scans
+
+production:
+  server:     mongo
+  port:       27017
+  database:   nessus
+  collection: scans

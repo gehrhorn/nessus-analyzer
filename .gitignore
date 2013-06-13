@@ -6,3 +6,7 @@
 Session.vim
 .netrwhist
 *.out
+<<<<<<< HEAD
+=======
+*.yaml
+>>>>>>> mongo-connection

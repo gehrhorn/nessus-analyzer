@@ -101,6 +101,7 @@ def calculate_statistics(scan)
   high_severity_hosts = 0
   aggregate_event_count = 0
   scan.each_host do |host|
+<<<<<<< HEAD
     host.each_event do |event| 
       aggregate_cvss_score += event.cvss_base_score unless
         event.cvss_base_score == false
@@ -123,8 +124,53 @@ def calculate_statistics(scan)
                       aggregate_ports / scan.host_count,
                       100 * ( high_severity_hosts.to_f / scan.host_count ),
                       aggregate_event_count / scan.host_count.to_f)
-end
+=======
+    aggregate_cvss_score += get_aggregate_cvss host
+    host.ports.delete("0")
+    aggregate_ports += host.ports.length
 
+    high_severity_hosts += 1 if host.high_severity_count > 0
+    aggregate_event_count += host.event_count
+  end
+   
+  send_graphite_stats(aggregate_cvss_score / scan.host_count,
+                      aggregate_ports / scan.host_count,
+                      100 * ( high_severity_hosts.to_f / scan.host_count ),
+                      aggregate_event_count / scan.host_count.to_f) if @opts[:graphite_server]
+
+  return display_stats_table(scan, 
+                      aggregate_cvss_score / scan.host_count,
+                      aggregate_ports / scan.host_count,
+                      100 * ( high_severity_hosts.to_f / scan.host_count ),
+                      aggregate_event_count / scan.host_count.to_f)
+end
+def get_aggregate_cvss(host)
+  aggregate_cvss_score = 0
+  host.each_event do |event|
+    aggregate_cvss_score += event.cvss_base_score unless
+      event.cvss_base_score == false
+  end
+
+  aggregate_cvss_score
+>>>>>>> mongo-connection
+end
+def read_config
+  begin
+    config = YAML.load_file("config.yaml")
+    raise "Can't find the #{@opts[:mongo]} section in config.yaml" if 
+      config[@opts[:mongo]].nil?
+    server = config[@opts[:mongo]]["server"]
+    port = config[@opts[:mongo]]["port"]
+    database = config[@opts[:mongo]]["database"]
+    collection = config[@opts[:mongo]]["collection"]
+  rescue
+    puts $!
+    exit
+  else
+    return server, port, database, collection
+  end
+
+<<<<<<< HEAD
 def make_mongo_doc(scan)
   scan_results = Array.new
   scan.each_host do |host|
@@ -156,6 +202,69 @@ def make_mongo_doc(scan)
   end
 
   scan_results
+=======
+end
+
+def make_mongo_doc(scan)
+  # uses the mongo-ruby-driver
+  # See: https://github.com/mongodb/mongo-ruby-driver/wiki
+
+  include Mongo
+  server, port, database, collection = read_config()
+
+  begin
+    dbclient = MongoClient.new(server, port)
+  rescue
+    puts $!
+    exit
+  else
+    db = dbclient.db(database)
+    coll= db[collection]
+
+    #this is for debugging. It deletes the whole collection every time
+    coll.remove
+    
+    scan.each_host do |host|
+      host_details = Hash.new
+      host_details["ip"] = host.to_s
+      host_details["hostname"] = host.hostname
+      host_details["mac_addr"] = host.mac_addr
+      host_details["os_name"] = host.os_name
+      host_details["open_ports"] = host.open_ports
+      host_details["scan title"] = scan.title
+      host_details["aggregate_cvss_score"] = get_aggregate_cvss(host)
+      # MongoDB BSON driver needs a UTC Time object
+      date = host.start_time
+      time = Time.utc(date.year, date.month, date.day)
+      host_details["scanned_on"] = time
+
+      host_details["events"] = Array.new
+      host.each_event do |event|
+        event_details = Hash.new
+        event_details["plugin_id"] = event.plugin_id
+        event_details["severity"] = event.severity
+        event_details["plugin_id"] = event.plugin_id
+        event_details["port"] = event.port.number.to_s
+        event_details["family"] = event.family
+        event_details["plugin_name"] = event.plugin_name
+        event_details["description"] = event.description
+        event_details["risk"] = event.risk
+        event_details["output"] = event.output
+        event_details["patch_publication_date"] = event.patch_publication_date.to_s
+        event_details["cvss_base_score"] = event.cvss_base_score
+        event_details["cve"] = event.cve
+        event_details["cvss_vector"] = event.cvss_vector
+        host_details["events"] << event_details
+      end
+      id = coll.insert(host_details)
+      # puts host_details.to_json
+    end
+  ensure
+    dbclient.close
+  end
+
+
+>>>>>>> mongo-connection
 end
 
 def process_nessus_file(nessus_file)
@@ -164,7 +273,11 @@ def process_nessus_file(nessus_file)
     puts calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
     puts calculate_statistics(scan) if @opts[:show_statistics]
+<<<<<<< HEAD
     puts make_mongo_doc(scan) if @opts[:mongo]
+=======
+    make_mongo_doc(scan) if @opts[:mongo]
+>>>>>>> mongo-connection
   end
 end
 
@@ -190,7 +303,12 @@ if __FILE__ == $PROGRAM_NAME
       :type => String, :short  => "-m"
     opt :timestamp, "Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.",
       :type  => Integer, :short => "-t"
+<<<<<<< HEAD
     opt :mongo, "Turn a scan into a MongoDB document", :short => "-d"
+=======
+    opt :mongo, "The MongoDB you want to connect to (defined in config.yaml)", :short => "-d",
+      :type  => String
+>>>>>>> mongo-connection
   end
 
   # Error handling. You have to spicify an action (stats, top x, etc.)
@@ -200,6 +318,12 @@ if __FILE__ == $PROGRAM_NAME
   Trollop::die :file, 
     "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
+<<<<<<< HEAD
+=======
+  Trollop::die :mongo,
+    "Couldn't find config.yaml (start with config.yaml.example)" unless
+    File.exist?("config.yaml") if @opts[:mongo]
+>>>>>>> mongo-connection
   Trollop::die :graphite_server, 
     "You need to use --show-statistics or -s if you're sending data to graphite" if
     @opts[:graphite_server] && !@opts[:show_statistics]
