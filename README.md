@@ -42,11 +42,18 @@ To send data to mongo you need to spucify the database ```--mongo development```
 and (optionally) tag your scan.
 
 ```./nessus-analyzer -f report.nessus -d development -t web,dev,Linux```
+
+
 The above sends data to the development database and tags each host in that 
-scan with: web, dev, and Linux. Tags are useful to query on later.
+scan with: web, dev, and Linux. Tags are useful to query on later. Tags are 
+optional. 
+
+```./Nessus-analyzer -f report.nessus -d development```
+
+This sends the same report to the development database, but omits any tags.
 
 
-### Running statistics of one scan
+### Displaying scan statistics
 ``` 
  ./nessus-analyzer.rb -f report.nessus -s
  +------------------------------------------+---------------+
@@ -63,58 +70,27 @@ scan with: web, dev, and Linux. Tags are useful to query on later.
  | Events per host                          |         12.83 |
  +------------------------------------------+---------------+
 ```
-### Running stats and sending them to graphite
+### Running stats and sending them to [ Graphite ](http://graphite.wikidot.com/)
 ```
 ./nessus-analyzer.rb -f report.nessus -s -g devgraphite -m stats.security.prodweb
 ```
-### Getting the top 5 events in a scan
-```yaml
-./nessus-analyzer.rb -f report.nessus -n 5
-- - 33929
-  - :count: 945
-  :name: PCI DSS compliance
-  :severity: 3
-  :severity_in_words: High Severity
-  :family: Policy Compliance
-  :synopsis: Nessus has determined that this host is NOT COMPLIANT with the PCI
-  DSS requirements.
-  :description: ! 'The remote web server is vulnerable to cross-site scripting (XSS)
-  attacks, implements old SSL2.0 cryptography, runs obsolete software, or is affected
-  by dangerous vulnerabilities (CVSS base score >= 4).
 
+## Dependencies
+* [ ruby-nessus ](https://github.com/mephux/ruby-nessus)
+* [mongo-ruby-driver](https://github.com/mongodb/mongo-ruby-driver)
+* [terminal-table](https://github.com/visionmedia/terminal-table)
+* [bson_ext](https://rubygems.org/gems/bson_ext) - *not actually required, but significant perfornamce penalties witout it.*
 
-  If you are conducting this scan through the Nessus Perimeter Service Plugin,
-  and if you disagree with the results, you may submit this report by clicking
-  on ''Submit for PCI Validation'' and dispute the findings through our web interface.'
-  :solution: false
-  :cvss_base_score: false
-  :cve: false
-  :cvss_vector: false
-- - 65821
-   - :count: 595
-   :name: SSL RC4 Cipher Suites Supported
-   :severity: 1
-   :severity_in_words: Low Severity
-   :family: General
-   :synopsis: The remote service supports the use of the RC4 cipher.
-   :description: ! "The remote host supports the use of RC4 in one or more cipher
-   suites. The RC4 cipher is flawed in its generation of a pseudo-random stream
-   of bytes so that a wide variety of small biases are introduced into the stream,
-   decreasing its randomness. \n\nIf plaintext is repeatedly encrypted (e.g.  HTTP
-   cookies), and an attacker is able to obtain many (i.e.  tens of millions) ciphertexts,
-   the attacker may be able to derive the plaintext."
-   :solution: Reconfigure the affected application, if possible, to avoid use of
-   RC4 ciphers.
-   :cvss_base_score: 2.6
-   :cve: CVE-2013-2566
-   :cvss_vector: CVSS2#AV:N/AC:H/Au:N/C:P/I:N/A:N
-...
-```
-
-Make sure you have [ruby-nessus](https://github.com/mephux/ruby-nessus) installed from [source](https://github.com/mephux/ruby-nessus) or via a [gem](http://rubygems.org/gems/ruby-nessus). You can include ruby-nessus with:
-
-```
-require 'nessus'
-```
+## Conrtibuting
+* Fork the project. Generally I think [Scott Chacon]
+(http://scottchacon.com/2011/08/31/github-flow.html) offers good advice on the
+subject.
+* Make a topic branch.
+* Squash your commits.
+* Add tests for it. This is important so I don't break it in a
+  future version unintentionally. (I realize there are no tests now, the irony
+  isn't lost on me).
+* Don't edit the version, tags, or history.
+* Send me a pull request. 
 
 :beers:
