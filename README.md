@@ -41,6 +41,11 @@ production:
 To send data to mongo you need to spucify the database ```--mongo development```
 and (optionally) tag your scan.
 
+```./nessus-analyzer -f report.nessus -d development -t web,dev,Linux```
+The above sends data to the development database and tags each host in that 
+scan with: web, dev, and Linux. Tags are useful to query on later.
+
+
 ### Running statistics of one scan
 ``` 
  ./nessus-analyzer.rb -f report.nessus -s
