@@ -9,7 +9,6 @@ require 'json'
 require 'set'
 require 'trollop'
 require 'socket'
-require 'pp'
 require 'mongo'
 require 'bson'
 
@@ -51,7 +50,7 @@ def calculate_top_events(scan, event_count)
 end
 
 def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts, events_per_host)
-
+  # Formats a nice looking table for terminal display
   output_table = Terminal::Table.new :title => scan.title, 
     :style => {:width =>  60 }
   output_table << ['Total hosts', scan.host_count]
@@ -67,8 +66,8 @@ def display_stats_table(scan, cvss_per_host, ports_per_host, high_severity_hosts
     sprintf("%.2f%%", high_severity_hosts)]
   output_table << ['Events per host', sprintf("%.2f", events_per_host)]
   output_table.align_column(1, :right)
-  output_table 
 
+  output_table 
 end
 
 def send_graphite_stats(cvss_per_host, ports_per_host, high_severity_hosts, events_per_host)
@@ -94,14 +93,32 @@ def send_graphite_stats(cvss_per_host, ports_per_host, high_severity_hosts, even
   end
 end
 
+def get_aggregate_cvss(host)
+  # aggregate_cvss_score is a proxy measure of risk
+  aggregate_cvss_score = 0
+  host.each_event do |event|
+    aggregate_cvss_score += event.cvss_base_score unless
+      event.cvss_base_score == false
+  end
+
+  aggregate_cvss_score
+end
+
 def calculate_statistics(scan)
-  # calculate some stats. 
+  # Calculate statistics of interest for metrics.
+  # 1. Average aggrergate CVSS per host
+  # 2. Average # of open ports per host
+  # 3. Percentage of hosts with a high severity event
+  # 4. Average number of events per host
+  # Other stats (e.g. number of high severity issues) are sent to 
+  # send_graphite_stats and display_stats_table via the "scan" parameter
   aggregate_cvss_score = 0
   aggregate_ports = 0
   high_severity_hosts = 0
   aggregate_event_count = 0
   scan.each_host do |host|
     aggregate_cvss_score += get_aggregate_cvss host
+
     host.ports.delete("0")
     aggregate_ports += host.ports.length
 
@@ -120,14 +137,22 @@ def calculate_statistics(scan)
                       100 * ( high_severity_hosts.to_f / scan.host_count ),
                       aggregate_event_count / scan.host_count.to_f)
 end
-def get_aggregate_cvss(host)
-  aggregate_cvss_score = 0
-  host.each_event do |event|
-    aggregate_cvss_score += event.cvss_base_score unless
-      event.cvss_base_score == false
-  end
 
-  aggregate_cvss_score
+def read_config
+  begin
+    config = YAML.load_file("config.yaml")
+    raise "Can't find the #{@opts[:mongo]} section in config.yaml" if 
+    config[@opts[:mongo]].nil?
+    server = config[@opts[:mongo]]["server"]
+    port = config[@opts[:mongo]]["port"]
+    database = config[@opts[:mongo]]["database"]
+    collection = config[@opts[:mongo]]["collection"]
+  rescue
+    puts $!
+    exit
+  else
+    return server, port, database, collection
+  end
 end
 
 def make_mongo_doc(scan)
@@ -158,10 +183,15 @@ def make_mongo_doc(scan)
       host_details["open_ports"] = host.open_ports
       host_details["scan title"] = scan.title
       host_details["aggregate_cvss_score"] = get_aggregate_cvss(host)
+      host_details["tags"] = @opts[:tags].split(",") unless @opts[:tags].nil?
       # MongoDB BSON driver needs a UTC Time object
       date = host.start_time
       time = Time.utc(date.year, date.month, date.day)
       host_details["scanned_on"] = time
+
+      # All of the nessus 'events' are added to an array called 'events'
+      # These are represented as Mongo subdocuments
+      # http://docs.mongodb.org/manual/tutorial/model-embedded-one-to-many-relationships-between-documents/
 
       host_details["events"] = Array.new
       host.each_event do |event|
@@ -182,8 +212,8 @@ def make_mongo_doc(scan)
         host_details["events"] << event_details
       end
       id = coll.insert(host_details)
-      # puts host_details.to_json
     end
+
   ensure
     dbclient.close
   end
@@ -194,9 +224,12 @@ end
 def process_nessus_file(nessus_file)
   # deal with nessus_file per the Trollop opts that were set
   Nessus::Parse.new(nessus_file) do |scan|
+
     puts calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
+
     puts calculate_statistics(scan) if @opts[:show_statistics]
+
     make_mongo_doc(scan) if @opts[:mongo]
   end
 end
@@ -215,34 +248,41 @@ if __FILE__ == $PROGRAM_NAME
     opt :file, "The .nessus file you want to process", :type => String, 
       :short => "-f"
     opt :top_events, "The <i> most common events", :type => Integer, 
-      :short => "-n"
+      :short => "-e"
     opt :show_statistics, "Show report statistic", :short => "-s"
     opt :graphite_server, "The graphite server you want to send data to",
       :type => String, :short  => "-g"
     opt :graphite_metric, "The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to",
       :type => String, :short  => "-m"
     opt :timestamp, "Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.",
-      :type  => Integer, :short => "-t"
-    opt :mongo, "The MongoDB you want to connect to (defined in config.yaml)", :short => "-d",
-      :type  => String
+      :type  => Integer, :short => "-n"
+    opt :mongo, "The MongoDB you want to connect to (defined in config.yaml)", 
+      :short => "-d", :type  => String
+    opt :tags, "Tag Mongo document (provide a comma delimited list, no spaces)",
+      :short  => "-t", :type => String
   end
 
-  # Error handling. You have to spicify an action (stats, top x, etc.)
-  # and you have to set a file or directory (not both) to process
+  # File error handling
   Trollop::die :file, 
     "required argument" unless @opts[:file]
   Trollop::die :file, 
     "must exist" unless 
     File.exist?(@opts[:file]) if @opts[:file] 
-  Trollop::die :mongo,
-    "Couldn't find config.yaml (start with config.yaml.example)" unless
-    File.exist?("config.yaml") if @opts[:mongo]
+
+  # Graphite error handling
   Trollop::die :graphite_server, 
     "You need to use --show-statistics or -s if you're sending data to graphite" if
     @opts[:graphite_server] && !@opts[:show_statistics]
   Trollop::die :graphite_server, 
     "You need to specify a metric (-m) to send to graphite" if
     @opts[:graphite_metric].nil? && @opts[:graphite_server]
+
+  # Mongo error handling
+  Trollop::die :mongo,
+    "Couldn't find config.yaml (start with config.yaml.example)" unless
+    File.exist?("config.yaml") if @opts[:mongo]
+  Trollop::die :tags,
+    "You need to send data to MongoDB to use categories" unless @opts[:mongo]
 
   process_nessus_file @opts[:file] 
 end
