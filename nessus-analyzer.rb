@@ -4,6 +4,10 @@ $LOAD_PATH << 'lib'
 require 'rubygems'
 require 'bundler/setup'
 
+require 'nessus'
+require 'terminal-table'
+require 'bson'
+require 'mongo'
 require 'yaml'
 require 'trollop'
 require 'socket'
@@ -278,7 +282,7 @@ if __FILE__ == $PROGRAM_NAME
     "Couldn't find config.yaml (start with config.yaml.example)" unless
     File.exist?("config.yaml") if @opts[:mongo]
   Trollop::die :tags,
-    "You need to send data to MongoDB to use categories" unless @opts[:mongo]
+    "You need to send data to MongoDB to use categories" if @opts[:tags] and @opts[:mongo].nil?
 
   process_nessus_file @opts[:file] 
 end
