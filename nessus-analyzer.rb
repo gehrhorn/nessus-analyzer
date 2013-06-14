@@ -172,7 +172,7 @@ def make_mongo_doc(scan)
     coll= db[collection]
 
     #this is for debugging. It deletes the whole collection every time
-    coll.remove
+    # coll.remove
     
     scan.each_host do |host|
       host_details = Hash.new
