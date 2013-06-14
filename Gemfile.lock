@@ -1,45 +1,25 @@
 GEM
   remote: https://rubygems.org/
   specs:
-<<<<<<< HEAD
-    mini_portile (0.5.0)
-    nokogiri (1.6.0)
-      mini_portile (~> 0.5.0)
-=======
-    activemodel (3.2.13)
-      activesupport (= 3.2.13)
-      builder (~> 3.0.0)
-    activesupport (3.2.13)
-      i18n (= 0.6.1)
-      multi_json (~> 1.0)
     bson (1.9.0)
-    builder (3.0.4)
-    i18n (0.6.1)
+    bson_ext (1.9.0)
+      bson (~> 1.9.0)
     mini_portile (0.5.0)
     mongo (1.9.0)
       bson (~> 1.9.0)
-    mongo_mapper (0.12.0)
-      activemodel (~> 3.0)
-      activesupport (~> 3.0)
-      plucky (~> 0.5.2)
-    multi_json (1.7.6)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
-    plucky (0.5.2)
-      mongo (~> 1.5)
->>>>>>> mongo-connection
     rainbow (1.1.4)
     ruby-nessus (1.1.0)
       nokogiri (~> 1.4)
       rainbow (~> 1.0)
+    terminal-table (1.4.5)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-<<<<<<< HEAD
-=======
-  bson
-  mongo_mapper
->>>>>>> mongo-connection
-  ruby-nessus
+  bson_ext (~> 1.9.0)
+  mongo (~> 1.9.0)
+  ruby-nessus (~> 1.1.0)
+  terminal-table (~> 1.4.5)

@@ -2,13 +2,11 @@
 
 $LOAD_PATH << 'lib'
 require 'rubygems'
-require 'nessus'
-require 'terminal-table'
+require 'bundler/setup'
+
 require 'yaml'
 require 'trollop'
 require 'socket'
-require 'mongo'
-require 'bson'
 
 def calculate_top_events(scan, event_count)
   # Calculate the top event_count events from scan.
