@@ -20,6 +20,27 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
 ```
 
 ## Examples
+### Sending data to MongoDB
+Nessus-analyzer supports sending data to MongoDB. To do this you need to 
+configure your config.yaml file.
+
+```yaml
+development:
+  server:     devmongo
+  port:       27017
+  database:   nessus
+  collection: scans
+
+production:
+  server:     mongo
+  port:       27017
+  database:   nessus
+  collection: scans
+```
+
+To send data to mongo you need to spucify the database ```--mongo development```
+and (optionally) tag your scan.
+
 ### Running statistics of one scan
 ``` 
  ./nessus-analyzer.rb -f report.nessus -s
