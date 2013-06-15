@@ -81,7 +81,9 @@ This sends the same report to the development database, but omits any tags.
 * [terminal-table](https://github.com/visionmedia/terminal-table)
 * [bson_ext](https://rubygems.org/gems/bson_ext) - *not actually required, but significant perfornamce penalties witout it.*
 
-## Conrtibuting
+## Contributing
+* I would love your help. Features, tests, documentation, bug reporting, etc.
+Really, I would love it.
 * Fork the project. Generally I think [Scott Chacon]
 (http://scottchacon.com/2011/08/31/github-flow.html) offers good advice on the
 subject.
