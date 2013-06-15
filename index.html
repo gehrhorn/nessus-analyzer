@@ -1,50 +1,39 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Nessus-analyzer by gehrhorn</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
     <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <title>Nessus-analyzer by gehrhorn</title>
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/gehrhorn/nessus-analyzer">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/gehrhorn/nessus-analyzer/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/gehrhorn/nessus-analyzer/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+    <div id="container">
+      <div class="inner">
 
-    <div class="wrapper">
-
-      <section>
-        <div id="title">
+        <header>
           <h1>Nessus-analyzer</h1>
-          <p>Ruby script to analyze Nessus files and generate statistics</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/gehrhorn">gehrhorn</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
-        </div>
+          <h2>Ruby script to analyze Nessus files and generate statistics</h2>
+        </header>
 
-        <h1>
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/gehrhorn/nessus-analyzer/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/gehrhorn/nessus-analyzer/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/gehrhorn/nessus-analyzer" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
 <a name="tool-to-analyze-nessus-output" class="anchor" href="#tool-to-analyze-nessus-output"><span class="octicon octicon-link"></span></a>Tool to analyze Nessus output</h1>
 
-<p>Make sure you have <a href="https://github.com/mephux/ruby-nessus">ruby-nessus</a> installed from <a href="https://github.com/mephux/ruby-nessus">source</a> or via a <a href="http://rubygems.org/gems/ruby-nessus">gem</a>. You can include ruby-nessus with:</p>
-
-<pre><code>require 'nessus'
-</code></pre>
 
 <h2>
 <a name="running-the-analyzer" class="anchor" href="#running-the-analyzer"><span class="octicon octicon-link"></span></a>Running the analyzer</h2>
@@ -52,21 +41,20 @@
 <p>Every time you run the analyzer you need to supply two options:</p>
 
 <ol>
-<li>The file or directory of files that you want to analyze (never both).</li>
+<li>The file or you want to analyze.</li>
 <li>The action you want to take (find top events, show stats, send to graphite, etc)</li>
 </ol><pre><code>Options:
-    Nessus-Analyzer parses nessus output files.
-      Usage: ./nessus-analyzer.rb [options] [file/directory]
-        where [options] are:
-        --top-events, -n &lt;i&gt;:   The &lt;i&gt; most common events
-        --show-statistics, -s:   Show report statistic
-        --file, -f &lt;s&gt;:   The .nessus file you want to process
-        --dir, -d &lt;s&gt;:   The directory containing .nessus files you want to process
-        --event-id, -e &lt;i&gt;:   Show all hosts that match the supplied id
-        --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
-        --graphite-metric, -m &lt;s&gt;:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
-        --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
-        --help, -h:   Show this message
+Nessus-Analyzer parses nessus output files.
+Usage: ./nessus-analyzer.rb [options] -f report.nessus 
+  where [options] are:
+  --file, -f &lt;s&gt;:   The .nessus file you want to process
+  --top-events, -n &lt;i&gt;:   The &lt;i&gt; most common events
+  --show-statistics, -s:   Show report statistic
+  --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
+  --graphite-metric, -m &lt;s&gt;:   The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to
+  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.
+  --mongo, -d: Turn a file into a document that can be imported into mongo
+  --help, -h:   Show this message
 </code></pre>
 
 <h2>
@@ -75,9 +63,9 @@
 <h3>
 <a name="running-statistics-of-one-scan" class="anchor" href="#running-statistics-of-one-scan"><span class="octicon octicon-link"></span></a>Running statistics of one scan</h3>
 
-<pre><code> ./nessus-analyzer.rb -f /data/nessus-analyzer-data/report.nessus -s
+<pre><code> ./nessus-analyzer.rb -f report.nessus -s
  +------------------------------------------+---------------+
-|                   SCAN TITLE GOES HERE                   |
+ |                   SCAN TITLE GOES HERE                   |
  +------------------------------------------+---------------+
  | Total hosts                              |           826 |
  | High severity issues                     |          1547 |
@@ -92,53 +80,74 @@
 </code></pre>
 
 <h3>
-<a name="running-statistics-of-an-entire-directory" class="anchor" href="#running-statistics-of-an-entire-directory"><span class="octicon octicon-link"></span></a>Running statistics of an entire directory</h3>
-
-<pre><code>./nessus-analyzer.rb -d /data/nessus-analyzer-data -s
-+------------------------------------------+---------------+
-|                   SCAN TITLE GOES HERE                   |
-+------------------------------------------+---------------+
-| Total hosts                              |           122 |
-| High severity issues                     |           271 |
-| Medium severity issues                   |          1125 |
-| Low severity isseus                      |           201 |
-+------------------------------------------+---------------+
-| CVSS / host                              |         58.05 |
-| Ports / host                             |         15.00 |
-| % Hosts with a high severity issue       |        82.79% |
-| Events per host                          |         13.09 |
-+------------------------------------------+---------------+
-
-+-------------------------------------------+--------------+
-|                   SCAN TITLE GOES HERE                   |
-+-------------------------------------------+--------------+
-| Total hosts                               |            1 |
-| High severity issues                      |            0 |
-| Medium severity issues                    |            5 |
-| Low severity isseus                       |            0 |
-+-------------------------------------------+--------------+
-| CVSS / host                               |        50.00 |
-| Ports / host                              |         1.00 |
-| % Hosts with a high severity issue        |        0.00% |
-| Events per host                           |         5.00 |
-+-------------------------------------------+--------------+
-</code></pre>
 
 <h3>
 <a name="running-stats-and-sending-them-to-graphite" class="anchor" href="#running-stats-and-sending-them-to-graphite"><span class="octicon octicon-link"></span></a>Running stats and sending them to graphite</h3>
 
-<pre><code>./nessus-analyzer.rb -f /data/nessus-analyzer-data/report_10s.nessus -s -g devgraphite -m stats.security.prodweb
+<pre><code>./nessus-analyzer.rb -f report.nessus -s -g graphite -m path.to.metric
 </code></pre>
 
 <h3>
+<<<<<<< HEAD
+=======
+<a name="getting-the-top-5-events-in-a-scan" class="anchor" href="#getting-the-top-5-events-in-a-scan"><span class="octicon octicon-link"></span></a>Getting the top 5 events in a scan</h3>
+
+<div class="highlight"><pre><span class="l-Scalar-Plain">./nessus-analyzer.rb -f report.nessus -n 5</span>
+<span class="l-Scalar-Plain">- - 33929</span>
+  <span class="l-Scalar-Plain">- :count</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">945</span>
+  <span class="l-Scalar-Plain">:name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">PCI DSS compliance</span>
+  <span class="l-Scalar-Plain">:severity</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">3</span>
+  <span class="l-Scalar-Plain">:severity_in_words</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">High Severity</span>
+  <span class="l-Scalar-Plain">:family</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Policy Compliance</span>
+  <span class="l-Scalar-Plain">:synopsis</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Nessus has determined that this host is NOT COMPLIANT with the PCI</span>
+  <span class="l-Scalar-Plain">DSS requirements.</span>
+  <span class="l-Scalar-Plain">:description</span><span class="p-Indicator">:</span> <span class="kt">!</span> <span class="s">'The</span><span class="nv"> </span><span class="s">remote</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">server</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">vulnerable</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">cross-site</span><span class="nv"> </span><span class="s">scripting</span><span class="nv"> </span><span class="s">(XSS)</span>
+  <span class="s">attacks,</span><span class="nv"> </span><span class="s">implements</span><span class="nv"> </span><span class="s">old</span><span class="nv"> </span><span class="s">SSL2.0</span><span class="nv"> </span><span class="s">cryptography,</span><span class="nv"> </span><span class="s">runs</span><span class="nv"> </span><span class="s">obsolete</span><span class="nv"> </span><span class="s">software,</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">affected</span>
+  <span class="s">by</span><span class="nv"> </span><span class="s">dangerous</span><span class="nv"> </span><span class="s">vulnerabilities</span><span class="nv"> </span><span class="s">(CVSS</span><span class="nv"> </span><span class="s">base</span><span class="nv"> </span><span class="s">score</span><span class="nv"> </span><span class="s">&gt;=</span><span class="nv"> </span><span class="s">4).</span>
+
+
+  <span class="s">If</span><span class="nv"> </span><span class="s">you</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">conducting</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">scan</span><span class="nv"> </span><span class="s">through</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">Nessus</span><span class="nv"> </span><span class="s">Perimeter</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Plugin,</span>
+  <span class="s">and</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">you</span><span class="nv"> </span><span class="s">disagree</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">results,</span><span class="nv"> </span><span class="s">you</span><span class="nv"> </span><span class="s">may</span><span class="nv"> </span><span class="s">submit</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">report</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">clicking</span>
+  <span class="s">on</span><span class="nv"> </span><span class="se">''</span><span class="s">Submit</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">PCI</span><span class="nv"> </span><span class="s">Validation</span><span class="se">''</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">dispute</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">findings</span><span class="nv"> </span><span class="s">through</span><span class="nv"> </span><span class="s">our</span><span class="nv"> </span><span class="s">web</span><span class="nv"> </span><span class="s">interface.'</span>
+  <span class="l-Scalar-Plain">:solution</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+  <span class="l-Scalar-Plain">:cvss_base_score</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+  <span class="l-Scalar-Plain">:cve</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+  <span class="l-Scalar-Plain">:cvss_vector</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+<span class="p-Indicator">-</span> <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">65821</span>
+   <span class="l-Scalar-Plain">- :count</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">595</span>
+  <span class="-Error"> </span><span class="l-Scalar-Plain">:name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">SSL RC4 Cipher Suites Supported</span>
+   <span class="l-Scalar-Plain">:severity</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span>
+   <span class="l-Scalar-Plain">:severity_in_words</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Low Severity</span>
+   <span class="l-Scalar-Plain">:family</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">General</span>
+   <span class="l-Scalar-Plain">:synopsis</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">The remote service supports the use of the RC4 cipher.</span>
+   <span class="l-Scalar-Plain">:description</span><span class="p-Indicator">:</span> <span class="kt">!</span> <span class="s">"The</span><span class="nv"> </span><span class="s">remote</span><span class="nv"> </span><span class="s">host</span><span class="nv"> </span><span class="s">supports</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">use</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">RC4</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">one</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">more</span><span class="nv"> </span><span class="s">cipher</span>
+   <span class="s">suites.</span><span class="nv"> </span><span class="s">The</span><span class="nv"> </span><span class="s">RC4</span><span class="nv"> </span><span class="s">cipher</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">flawed</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">its</span><span class="nv"> </span><span class="s">generation</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">pseudo-random</span><span class="nv"> </span><span class="s">stream</span>
+   <span class="s">of</span><span class="nv"> </span><span class="s">bytes</span><span class="nv"> </span><span class="s">so</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">wide</span><span class="nv"> </span><span class="s">variety</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">small</span><span class="nv"> </span><span class="s">biases</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">introduced</span><span class="nv"> </span><span class="s">into</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">stream,</span>
+   <span class="s">decreasing</span><span class="nv"> </span><span class="s">its</span><span class="nv"> </span><span class="s">randomness.</span><span class="nv"> </span><span class="s">\n\nIf</span><span class="nv"> </span><span class="s">plaintext</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">repeatedly</span><span class="nv"> </span><span class="s">encrypted</span><span class="nv"> </span><span class="s">(e.g.</span><span class="nv">  </span><span class="s">HTTP</span>
+   <span class="s">cookies),</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">attacker</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">obtain</span><span class="nv"> </span><span class="s">many</span><span class="nv"> </span><span class="s">(i.e.</span><span class="nv">  </span><span class="s">tens</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">millions)</span><span class="nv"> </span><span class="s">ciphertexts,</span>
+   <span class="s">the</span><span class="nv"> </span><span class="s">attacker</span><span class="nv"> </span><span class="s">may</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">derive</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">plaintext."</span>
+   <span class="l-Scalar-Plain">:solution</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Reconfigure the affected application, if possible, to avoid use of</span>
+   <span class="l-Scalar-Plain">RC4 ciphers.</span>
+   <span class="l-Scalar-Plain">:cvss_base_score</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">2.6</span>
+   <span class="l-Scalar-Plain">:cve</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">CVE-2013-2566</span>
+   <span class="l-Scalar-Plain">:cvss_vector</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">CVSS2#AV:N/AC:H/Au:N/C:P/I:N/A:N</span>
+<span class="nn">...</span>
+>>>>>>> d4d602121987d19fcd6d716294caac7ffc995d1d
 </pre></div>
 
-<p><img class="emoji" title=":beers:" alt=":beers:" src="https://a248.e.akamai.net/assets.github.com/images/icons/emoji/beers.png" height="20" width="20" align="absmiddle"></p>
-      </section>
+<p>Make sure you have <a href="https://github.com/mephux/ruby-nessus">ruby-nessus</a> installed from <a href="https://github.com/mephux/ruby-nessus">source</a> or via a <a href="http://rubygems.org/gems/ruby-nessus">gem</a>. You can include ruby-nessus with:</p>
 
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+<pre><code>require 'nessus'
+</code></pre>
+<p><img class="emoji" title=":beers:" alt=":beers:" src="https://a248.e.akamai.net/assets.github.com/images/icons/emoji/beers.png" height="20" width="20" align="absmiddle"></p>
+        </section>
+
+        <footer>
+          Nessus-analyzer is maintained by <a href="https://github.com/gehrhorn">gehrhorn</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -149,5 +158,7 @@
             } catch(err) {}
           </script>
 
+      </div>
+    </div>
   </body>
 </html>
