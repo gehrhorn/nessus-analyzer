@@ -38,7 +38,7 @@ production:
   collection: scans
 ```
 
-To send data to mongo you need to spucify the database ```--mongo development```
+To send data to mongo you need to specify the database ```--mongo development```
 and (optionally) tag your scan.
 
 ```./nessus-analyzer -f report.nessus -d development -t web,dev,Linux```
