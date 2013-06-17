@@ -84,9 +84,7 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
 <pre><code>../nessus-analyzer.rb -f report.name -d development</code></pre>
 
   <h3><a name="fun-mongo-queries" class="anchor" href="#fun-mongo-queries"><span class="octicon octicon-link"></span></a>Fun mongo queries</h3>
-  <pre><code># Fun mongo commands
-
-  # All systems tagged with "web" sorted by aggregate risk
+  <pre><code> # All systems tagged with "web" sorted by aggregate risk
   db.scans.find( 
     { tags: { $in : ['web'] } }, 
     { 
