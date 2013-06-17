@@ -87,19 +87,49 @@ Usage: ./nessus-analyzer.rb [options] -f report.nessus
   <pre><code># Fun mongo commands
 
   # All systems tagged with "web" sorted by aggregate risk
-  db.scans.find( { tags: { $in : ['web'] } }, { _id: 0, ip: 1, hostname: 1, aggregate_cvss_score: 1} ).sort({ aggregate_cvss_score : -1})
+  db.scans.find( 
+    { tags: { $in : ['web'] } }, 
+    { 
+      _id: 0, 
+      ip: 1, 
+      hostname: 1, 
+      aggregate_cvss_score: 1} 
+    ).sort({ aggregate_cvss_score : -1})
 
   # hostname, ip, tags that have an event in the "DoS" family
-  db.scans.find( {  "events.family": "Denial of Service" } , { _id: 0, hostname: 1, ip: 1, tags: 1 } ).sort( { hostname: 1 } )
+  db.scans.find( 
+    {  "events.family": "Denial of Service" }, 
+    { 
+      _id: 0, 
+      hostname: 1, 
+      ip: 1, 
+      tags: 1 } 
+    ).sort( { hostname: 1 } )
 
   # All hosts with a high (>=3) severity event
-  db.scans.find( { "events.severity" : { $gte: 3} }, { _id: 0, hostname: 1, ip: 1, os_name: 1 } ).sort( { hostname: -1 }).limit(50)
+  db.scans.find( 
+  { 
+    "events.severity" : { $gte: 3} }, 
+    { 
+      _id: 0, 
+      hostname: 1, 
+      ip: 1, 
+      os_name: 1 } 
+    ).sort( { hostname: -1 }).limit(50)
 
   # All hosts with a high (>=3) severity event where there is a patch available
-  db.scans.find( { "events.severity" : { $gte: 3 }, "patch_publication_date" : { $ne: "false" } }, { _id: 0, ip: 1, hostname: 1 } )
+  db.scans.find( 
+  { 
+    "events.severity" : { $gte: 3 }, 
+    "patch_publication_date" : { $ne: "false" } 
+  }, 
+  { 
+    _id: 0, 
+    ip: 1, 
+    hostname: 1 
+  } )
 
   # All unique hosts with a high (>=3) severity event where there is a patch available
-  db.scans.distinct( 'ip', { "events.severity" : { $gte: 3}, "patch_publication_date": {$ne: "false"}}) </code></pre>
 <h3>
 <a name="running-stats-and-sending-them-to-graphite" class="anchor" href="#running-stats-and-sending-them-to-graphite"><span class="octicon octicon-link"></span></a>Running stats and sending them to graphite</h3>
 
