@@ -7,9 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -19,7 +17,10 @@
       <header>
         <h1>Nessus-analyzer</h1>
         <p>Ruby script to analyze Nessus files and generate statistics</p>
+
         <p class="view"><a href="https://github.com/gehrhorn/nessus-analyzer">View the Project on GitHub <small>gehrhorn/nessus-analyzer</small></a></p>
+
+
         <ul>
           <li><a href="https://github.com/gehrhorn/nessus-analyzer/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/gehrhorn/nessus-analyzer/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -38,84 +39,20 @@
 <ol>
 <li>The file or you want to analyze.</li>
 <li>The action you want to take (find top events, show stats, send to graphite, etc)</li>
-</ol><pre><code>Usage: ./nessus-analyzer.rb [options] -f report.nessus 
-  where [options] are:
-  --file, -f &lt;s&gt;:   The .nessus file you want to process
-  --top-events, -n &lt;i&gt;:   The &lt;i&gt; most common events
-  --show-statistics, -s:   Show report statistic
-  --graphite-server, -g &lt;s&gt;:   The graphite server you want to send data to
-  --graphite-metric, -m &lt;s&gt;:   The root graphite metric to send data to
-  --timestamp, -t &lt;i&gt;:   Graphite timestamp, defaults midnight of the current date.
-  --mongo, -d: Turn a file into a document that can be imported into mongo
-  --help, -h:   Show this message
-</code></pre>
+</ol><h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
-<h2>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
-
-<h3>
-<a name="sending-data-to-mongodb" class="anchor" href="#sending-data-to-mongodb"><span class="octicon octicon-link"></span></a>Sending data to MongoDB</h3>
-
-<p>Nessus-analyzer supports sending data to MongoDB. To do this you need to 
-configure your config.yaml file.</p>
-
-<div class="highlight"><pre><span class="l-Scalar-Plain">development</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">server</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">devmongo</span>
-  <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span>       <span class="l-Scalar-Plain">27017</span>
-  <span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">nessus</span>
-  <span class="l-Scalar-Plain">collection</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">scans</span>
-
-<span class="l-Scalar-Plain">production</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">server</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">mongo</span>
-  <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span>       <span class="l-Scalar-Plain">27017</span>
-  <span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">nessus</span>
-  <span class="l-Scalar-Plain">collection</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">scans</span>
-</pre></div>
-
-<p>To send data to mongo you need to specify the database <code>--mongo development</code>
-and (optionally) tag your scan.</p>
-
-<p><code>./nessus-analyzer -f report.nessus -d development -t web,dev,Linux</code></p>
-
-<p>The above sends data to the development database and tags each host in that 
-scan with: web, dev, and Linux. Tags are useful to query on later. Tags are 
-optional. </p>
-
-<p><code>./Nessus-analyzer -f report.nessus -d development</code></p>
-
-<p>This sends the same report to the development database, but omits any tags.</p>
-
-<h3>
-<a name="displaying-scan-statistics" class="anchor" href="#displaying-scan-statistics"><span class="octicon octicon-link"></span></a>Displaying scan statistics</h3>
-
-<pre><code> ./nessus-analyzer.rb -f report.nessus -s
- +------------------------------------------+---------------+
- |                   SCAN TITLE GOES HERE                   |
- +------------------------------------------+---------------+
- | Total hosts                              |           826 |
- | High severity issues                     |          1547 |
- | Medium severity issues                   |          7475 |
- | Low severity isseus                      |          1576 |
- +------------------------------------------+---------------+
- | CVSS / host                              |         58.67 |
- | Ports / host                             |         12.00 |
- | % Hosts with a high severity issue       |        88.01% |
- | Events per host                          |         12.83 |
- +------------------------------------------+---------------+
-</code></pre>
-
-<h3>
-<a name="running-stats-and-sending-them-to--graphite-" class="anchor" href="#running-stats-and-sending-them-to--graphite-"><span class="octicon octicon-link"></span></a>Running stats and sending them to <a href="http://graphite.wikidot.com/"> Graphite </a>
-</h3>
-
-<pre><code>./nessus-analyzer.rb -f report.nessus -s -g devgraphite -m stats.security.prodweb
-</code></pre>
-
-<h2>
+<ul>
+<li>
+<a href="https://github.com/gehrhorn/nessus-analyzer/wiki/MongoDB">Send data to MongoDB</a> to maintain a historical view of vulnerability data.</li>
+<li>
+<a href="https://github.com/gehrhorn/nessus-analyzer/wiki/Graphite">Send data to Graphite</a> to build a vulnerability dashboard.</li>
+<li><a href="https://github.com/gehrhorn/nessus-analyzer/wiki/Display-Statistics">Print some pretty statistics</a></li>
+</ul><h2>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
 
 <ul>
-<li><a href="https://github.com/mephux/ruby-nessus"> ruby-nessus </a></li>
+<li><a href="https://github.com/mephux/ruby-nessus">ruby-nessus</a></li>
 <li><a href="https://github.com/mongodb/mongo-ruby-driver">mongo-ruby-driver</a></li>
 <li><a href="https://github.com/visionmedia/terminal-table">terminal-table</a></li>
 <li>
@@ -138,12 +75,12 @@ isn't lost on me).</li>
 <li>Send me a pull request. </li>
 </ul><p><img class="emoji" title=":beers:" alt=":beers:" src="https://a248.e.akamai.net/assets.github.com/images/icons/emoji/beers.png" height="20" width="20" align="absmiddle"></p>
       </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/gehrhorn">gehrhorn</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/gehrhorn">gehrhorn</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    <script src="javascripts/scale.fix.js"></script>
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
