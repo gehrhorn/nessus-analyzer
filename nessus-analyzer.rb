@@ -2,8 +2,6 @@
 
 $LOAD_PATH << 'lib'
 require 'rubygems'
-require 'bundler/setup'
-
 require 'nessus'
 require 'terminal-table'
 require 'bson'
@@ -247,15 +245,18 @@ if __FILE__ == $PROGRAM_NAME
 
     opt :file, "The .nessus file you want to process", :type => String, 
       :short => "-f"
+
     opt :top_events, "The <i> most common events", :type => Integer, 
       :short => "-e"
     opt :show_statistics, "Show report statistic", :short => "-s"
+
     opt :graphite_server, "The graphite server you want to send data to",
       :type => String, :short  => "-g"
     opt :graphite_metric, "The root graphite metric (e.g. stats.security.prodweb, stats.security.cit) you want to send data to",
       :type => String, :short  => "-m"
     opt :timestamp, "Graphite timestamp, defaults midnight of the current date. Be careful you don't nuke your graph.",
       :type  => Integer, :short => "-n"
+
     opt :mongo, "The MongoDB you want to connect to (defined in config.yaml)", 
       :short => "-d", :type  => String
     opt :tags, "Tag Mongo document (provide a comma delimited list, no spaces)",
