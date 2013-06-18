@@ -72,7 +72,7 @@ def send_graphite_stats(cvss_per_host, ports_per_host, high_severity_hosts, even
   unless @opts[:timestamp]
     # if :timestamp isn't defined we'll use the most recent midnight
     now = Time.new
-    @opts[:timestamp] = Time.new(now.year, now.month, now.day, 0,0,0).to_i
+    @opts[:timestamp] = Time.local(now.year, now.month, now.day, 0,0,0).to_i
   end
   
   begin 
@@ -114,6 +114,7 @@ def calculate_statistics(scan)
   aggregate_ports = 0
   high_severity_hosts = 0
   aggregate_event_count = 0
+
   scan.each_host do |host|
     aggregate_cvss_score += get_aggregate_cvss host
 
@@ -129,11 +130,11 @@ def calculate_statistics(scan)
                       100 * ( high_severity_hosts.to_f / scan.host_count ),
                       aggregate_event_count / scan.host_count.to_f) if @opts[:graphite_server]
 
-  return display_stats_table(scan, 
+  puts display_stats_table(scan, 
                       aggregate_cvss_score / scan.host_count,
                       aggregate_ports / scan.host_count,
                       100 * ( high_severity_hosts.to_f / scan.host_count ),
-                      aggregate_event_count / scan.host_count.to_f)
+                      aggregate_event_count / scan.host_count.to_f) if @opts[:show_statistics]
 end
 
 def read_config
@@ -182,6 +183,7 @@ def make_mongo_doc(scan)
       host_details["scan title"] = scan.title
       host_details["aggregate_cvss_score"] = get_aggregate_cvss(host)
       host_details["tags"] = @opts[:tags].split(",") unless @opts[:tags].nil?
+
       # MongoDB BSON driver needs a UTC Time object
       date = host.start_time
       time = Time.utc(date.year, date.month, date.day)
@@ -226,7 +228,11 @@ def process_nessus_file(nessus_file)
     puts calculate_top_events(scan, @opts[:top_events]) unless 
       @opts[:top_events].nil? ||  @opts[:top_events] == 0
 
-    puts calculate_statistics(scan) if @opts[:show_statistics]
+    # calculate statistic is used by show_statistics and graphite_server flags
+    # for show_statistics it calcs the stats and displays a table
+    # for graphite_server it calcs the stats and sends them to graphite
+    # if both are specified it does both
+    calculate_statistics(scan) if @opts[:show_statistics] || @opts[:graphite_server]
 
     make_mongo_doc(scan) if @opts[:mongo]
   end
@@ -271,9 +277,6 @@ if __FILE__ == $PROGRAM_NAME
     File.exist?(@opts[:file]) if @opts[:file] 
 
   # Graphite error handling
-  Trollop::die :graphite_server, 
-    "You need to use --show-statistics or -s if you're sending data to graphite" if
-    @opts[:graphite_server] && !@opts[:show_statistics]
   Trollop::die :graphite_server, 
     "You need to specify a metric (-m) to send to graphite" if
     @opts[:graphite_metric].nil? && @opts[:graphite_server]
