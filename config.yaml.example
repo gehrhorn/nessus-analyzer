@@ -1,3 +1,6 @@
+# Configure database environments
+# Required fields are: server, port, database, collection
+
 development:
   server:     devmongo
   port:       27017
