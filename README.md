@@ -21,7 +21,7 @@ Every time you run the analyzer you need to supply two options:
 The [wiki](https://github.com/gehrhorn/nessus-analyzer/wiki) has more information.
 
 ## Contributing
-Want to [help](https://github.com/gehrhorn/nessus-analyzer#contributing)? I'd really love it.
+Want to help? I'd really love it.
 * [Submit](https://github.com/gehrhorn/nessus-analyzer/issues) a bug
 * [Edit](https://github.com/gehrhorn/nessus-analyzer/wiki/_pages) the wiki
 * Improve the [documentation](https://github.com/gehrhorn/nessus-analyzer/blob/master/README.md)
