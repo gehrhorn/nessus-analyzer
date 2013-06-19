@@ -17,18 +17,15 @@ Every time you run the analyzer you need to supply two options:
 * [terminal-table](https://github.com/visionmedia/terminal-table)
 * [bson_ext](https://rubygems.org/gems/bson_ext) - *not actually required, but significant perfornamce penalties witout it.*
 
+## Documentation
+The [wiki](https://github.com/gehrhorn/nessus-analyzer/wiki) has more information.
+
 ## Contributing
-* I would love your help. Features, tests, documentation, bug reporting, etc.
-Really, I would love it.
-* Fork the project. Generally I think [Scott Chacon]
-(http://scottchacon.com/2011/08/31/github-flow.html) offers good advice on the
-subject.
-* Make a topic branch.
-* Squash your commits.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally. (I realize there are no tests now, the irony
-  isn't lost on me).
-* Don't edit the version, tags, or history.
-* Send me a pull request. 
+Want to [help](https://github.com/gehrhorn/nessus-analyzer#contributing)? I'd really love it.
+* [Submit](https://github.com/gehrhorn/nessus-analyzer/issues) a bug
+* [Edit](https://github.com/gehrhorn/nessus-analyzer/wiki/_pages) the wiki
+* Improve the [documentation](https://github.com/gehrhorn/nessus-analyzer/blob/master/README.md)
+* Write some tests
+* [Fork](https://github.com/gehrhorn/nessus-analyzer/fork) the project and add new features
 
 :beers:
