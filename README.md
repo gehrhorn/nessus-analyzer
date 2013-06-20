@@ -1,5 +1,12 @@
 # Tool to analyze Nessus output
 
+## Description
+Nessus-analyzer aims to make Nessus data more useful by:
+
+1.  Giving you the ability to (programmatically) calculate useful security metrics.
+2.	Sending Nessus data to MongoDB to maintain a historical view of vulnerability data.
+3.	Sending data to Graphite to make awesome vulnerability charts.
+
 ## Running the analyzer
 Every time you run the analyzer you need to supply two options:
 
@@ -15,7 +22,7 @@ Every time you run the analyzer you need to supply two options:
 * [ruby-nessus](https://github.com/mephux/ruby-nessus)
 * [mongo-ruby-driver](https://github.com/mongodb/mongo-ruby-driver)
 * [terminal-table](https://github.com/visionmedia/terminal-table)
-* [bson_ext](https://rubygems.org/gems/bson_ext) - *not actually required, but significant perfornamce penalties witout it.*
+* [bson_ext](https://rubygems.org/gems/bson_ext) - *not actually required, but significant performance penalties without it.*
 
 ## Documentation
 The [wiki](https://github.com/gehrhorn/nessus-analyzer/wiki) has more information.
