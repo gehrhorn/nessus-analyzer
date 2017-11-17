@@ -28,6 +28,6 @@ Every time you run the analyzer you need to supply two options:
 The [wiki](https://github.com/gehrhorn/nessus-analyzer/wiki) has more information.
 
 ## Contributing
-Want to help? I'd really love it. Check out the [contributing guidelines](nessus-analyzer/CONTRIBUTING.md)
+Want to help? I'd really love it. Check out the [contributing guidelines](https://github.com/gehrhorn/nessus-analyzer/blob/master/CONTRIBUTING.md)
 
 :beers:
