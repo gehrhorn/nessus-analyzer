@@ -2,4 +2,4 @@
 
 ## Reporting a Vulnerability
 
-Open an bug and apply the 'security' label. 
+To report a security issue use the [security advisory](https://github.com/gehrhorn/nessus-analyzer/security/advisories/new) feature of GitHub.
